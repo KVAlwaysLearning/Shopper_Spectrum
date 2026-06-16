@@ -1,57 +1,53 @@
 import os
 import pickle
-import requests
 import numpy as np
 import pandas as pd
 import streamlit as st
+import gdown
 
 # Set webpage tab configurations
 st.set_page_config(page_title="E-Commerce Analytics Engine", layout="wide", page_icon="🛍️")
 
 # =====================================================================
-# 💾 ROBUST ASSET DOWNLOADER & CACHING PIPELINE
+# 💾 OPTIMIZED GDOWN ASSET RESOLUTION PIPELINE
 # =====================================================================
-def download_file_from_gdrive(file_id, destination):
-    """Downloads a public/shared file from Google Drive via its direct ID."""
+def download_large_file_from_gdrive(file_id, destination):
+    """Uses gdown to download large files bypassing Google Drive warning screens."""
     if not os.path.exists(destination):
         with st.spinner(f"Downloading required deployment asset: {destination}..."):
-            url = f"https://docs.google.com/uc?export=download&id={file_id}"
-            session = requests.Session()
-            response = session.get(url, stream=True)
-            
-            # Handle large files / warning pages if encountered
-            for key, value in response.cookies.items():
-                if key.startswith('download_warning'):
-                    url = f"https://docs.google.com/uc?export=download&confirm={value}&id={file_id}"
-                    response = session.get(url, stream=True)
-                    break
-                    
-            with open(destination, "wb") as f:
-                for chunk in response.iter_content(32768):
-                    if chunk: 
-                        f.write(chunk)
+            # Construct the authentic direct download string
+            url = f"https://drive.google.com/uc?id={file_id}"
+            try:
+                # gdown handles the token handshakes automatically
+                gdown.download(url, destination, quiet=True)
+            except Exception as e:
+                st.error(f"gdown direct download failed for {destination}: {e}")
 
 # Initialize variables as None to check status later
 loaded_scaler = None
 loaded_kmeans = None
 similarity_matrix = None
 
-# Step 1: Attempt to download files using credentials from Streamlit Secrets
+# Step 1: Attempt downloads using gdown and Streamlit Secrets IDs
 try:
     if "gdrive_file_ids" in st.secrets:
-        download_file_from_gdrive(st.secrets["gdrive_file_ids"]["scaler_id"], "scaler.pkl")
-        download_file_from_gdrive(st.secrets["gdrive_file_ids"]["kmeans_id"], "kmeans_model.pkl")
-        download_file_from_gdrive(st.secrets["gdrive_file_ids"]["matrix_id"], "recommendation_matrix.pkl")
+        download_large_file_from_gdrive(st.secrets["gdrive_file_ids"]["scaler_id"], "scaler.pkl")
+        download_large_file_from_gdrive(st.secrets["gdrive_file_ids"]["kmeans_id"], "kmeans_model.pkl")
+        download_large_file_from_gdrive(st.secrets["gdrive_file_ids"]["matrix_id"], "recommendation_matrix.pkl")
     else:
         st.error("❌ 'gdrive_file_ids' section missing from Streamlit Secrets config!")
 except Exception as e:
-    st.error(f"❌ Failed to download assets from Google Drive. Details: {e}")
+    st.error(f"❌ Asset sync process interrupted. Details: {e}")
 
 # High-efficiency resource caching to prevent performance degradation on state refresh
 @st.cache_resource
 def load_production_artifacts():
-    # Double-check files actually exist on disk before unpickling
     if os.path.exists('scaler.pkl') and os.path.exists('kmeans_model.pkl') and os.path.exists('recommendation_matrix.pkl'):
+        # Double check file size to ensure it's not a tiny empty/HTML file
+        if os.path.getsize('recommendation_matrix.pkl') < 2000:
+            st.error("❌ Downloaded files appear to be corrupted HTML pages instead of raw data models.")
+            return None, None, None
+            
         with open('scaler.pkl', 'rb') as f:
             scaler = pickle.load(f)
         with open('kmeans_model.pkl', 'rb') as f:
@@ -61,18 +57,18 @@ def load_production_artifacts():
         return scaler, kmeans, matrix
     return None, None, None
 
-# Step 2: Try loading the files into operational memory
+# Step 2: Load the files into operational memory
 try:
     loaded_scaler, loaded_kmeans, similarity_matrix = load_production_artifacts()
 except Exception as e:
     st.error(f"❌ Error loading pickle files into memory: {e}")
+    st.info("💡 Tip: If this is an 'invalid load key' error, your sharing permissions are likely restricted.")
 
-# Step 3: Global Safety Guardrail
-# If files are missing, halt application rendering right here and notify the user
+# Step 3: Global Safety Circuit Breaker
 if loaded_scaler is None or loaded_kmeans is None or similarity_matrix is None:
     st.warning("⚠️ **Application is paused:** The required ML models or recommendation matrices could not be loaded.")
-    st.info("💡 **How to fix this:** Click on **'Manage app'** in the lower right of your Streamlit Cloud dashboard, open the **Secrets** settings panel, and verify your file IDs match your public Google Drive download links perfectly.")
-    st.stop() # Stops execution of the rest of the script cleanly
+    st.info("💡 **How to fix this:** Verify that your files in Google Drive are set to **'Anyone with the link can view'**. If they are restricted, Google blocks the download and returns an HTML error page.")
+    st.stop()
     
 # =====================================================================
 # 🧭 SIDEBAR NAVIGATION CONTROLLER (Matching UI Screenshot)

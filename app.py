@@ -8,44 +8,61 @@ import gdown
 # Set webpage tab configurations
 st.set_page_config(page_title="E-Commerce Analytics Engine", layout="wide", page_icon="🛍️")
 
-# =====================================================================
-# 💾 OPTIMIZED GDOWN ASSET RESOLUTION PIPELINE
-# =====================================================================
-def download_large_file_from_gdrive(file_id, destination):
-    """Uses gdown to download large files bypassing Google Drive warning screens."""
-    if not os.path.exists(destination):
-        with st.spinner(f"Downloading required deployment asset: {destination}..."):
-            # Construct the authentic direct download string
-            url = f"https://drive.google.com/uc?id={file_id}"
-            try:
-                # gdown handles the token handshakes automatically
-                gdown.download(url, destination, quiet=True)
-            except Exception as e:
-                st.error(f"gdown direct download failed for {destination}: {e}")
+import os
+import pickle
+import urllib.request
+import numpy as np
+import pandas as pd
+import streamlit as st
 
-# Initialize variables as None to check status later
+# Set webpage tab configurations
+st.set_page_config(page_title="E-Commerce Analytics Engine", layout="wide", page_icon="🛍️")
+
+# =====================================================================
+# 💾 ROBUST BYPASS-LINK ASSET DOWNLOAD PIPELINE
+# =====================================================================
+def download_large_gdrive_file(file_id, destination):
+    """Downloads large binaries from GDrive, bypassing the large-file warning page."""
+    if not os.path.exists(destination):
+        with st.spinner(f"📥 Downloading required deployment asset: {destination}..."):
+            # The 'confirm=t' flag tells Google to skip the "cannot scan for viruses" HTML screen
+            url = f"https://docs.google.com/uc?export=download&id={file_id}&confirm=t"
+            
+            # Pretend to be a clean browser request to avoid catching an anti-bot HTML page
+            request_headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+            
+            try:
+                req = urllib.request.Request(url, headers=request_headers)
+                with urllib.request.urlopen(req) as response, open(destination, 'wb') as out_file:
+                    out_file.write(response.read())
+            except Exception as e:
+                st.error(f"❌ Network download error on {destination}: {e}")
+
+# Initialize global memory pointers
 loaded_scaler = None
 loaded_kmeans = None
 similarity_matrix = None
 
-# Step 1: Attempt downloads using gdown and Streamlit Secrets IDs
+# Step 1: Run the raw binary download streaming sequence
 try:
     if "gdrive_file_ids" in st.secrets:
-        download_large_file_from_gdrive(st.secrets["gdrive_file_ids"]["scaler_id"], "scaler.pkl")
-        download_large_file_from_gdrive(st.secrets["gdrive_file_ids"]["kmeans_id"], "kmeans_model.pkl")
-        download_large_file_from_gdrive(st.secrets["gdrive_file_ids"]["matrix_id"], "recommendation_matrix.pkl")
+        download_large_gdrive_file(st.secrets["gdrive_file_ids"]["scaler_id"], "scaler.pkl")
+        download_large_gdrive_file(st.secrets["gdrive_file_ids"]["kmeans_id"], "kmeans_model.pkl")
+        download_large_gdrive_file(st.secrets["gdrive_file_ids"]["matrix_id"], "recommendation_matrix.pkl")
     else:
-        st.error("❌ 'gdrive_file_ids' section missing from Streamlit Secrets config!")
+        st.error("❌ 'gdrive_file_ids' section missing from Streamlit Cloud Secrets Manager configuration!")
 except Exception as e:
-    st.error(f"❌ Asset sync process interrupted. Details: {e}")
+    st.error(f"❌ Download handshake execution failed: {e}")
 
-# High-efficiency resource caching to prevent performance degradation on state refresh
+# High-efficiency resource caching to protect server memory limits
 @st.cache_resource
 def load_production_artifacts():
     if os.path.exists('scaler.pkl') and os.path.exists('kmeans_model.pkl') and os.path.exists('recommendation_matrix.pkl'):
-        # Double check file size to ensure it's not a tiny empty/HTML file
-        if os.path.getsize('recommendation_matrix.pkl') < 2000:
-            st.error("❌ Downloaded files appear to be corrupted HTML pages instead of raw data models.")
+        # Check if the file is tiny (corrupted HTML is usually under 50KB, a true matrix is MBs)
+        if os.path.getsize('recommendation_matrix.pkl') < 50000:
+            st.error("❌ The downloaded asset is too small. Google Drive is still serving an HTML page instead of raw bytes.")
             return None, None, None
             
         with open('scaler.pkl', 'rb') as f:
@@ -57,17 +74,16 @@ def load_production_artifacts():
         return scaler, kmeans, matrix
     return None, None, None
 
-# Step 2: Load the files into operational memory
+# Step 2: Try reading the binary assets into memory
 try:
     loaded_scaler, loaded_kmeans, similarity_matrix = load_production_artifacts()
 except Exception as e:
     st.error(f"❌ Error loading pickle files into memory: {e}")
-    st.info("💡 Tip: If this is an 'invalid load key' error, your sharing permissions are likely restricted.")
 
 # Step 3: Global Safety Circuit Breaker
 if loaded_scaler is None or loaded_kmeans is None or similarity_matrix is None:
     st.warning("⚠️ **Application is paused:** The required ML models or recommendation matrices could not be loaded.")
-    st.info("💡 **How to fix this:** Verify that your files in Google Drive are set to **'Anyone with the link can view'**. If they are restricted, Google blocks the download and returns an HTML error page.")
+    st.info("💡 **How to resolve this right now:** Make sure your Google Drive files are set to **'Anyone with the link'** and check that you haven't copied the whole URL into Streamlit secrets, just the string of letters/numbers!")
     st.stop()
     
 # =====================================================================

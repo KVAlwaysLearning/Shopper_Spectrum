@@ -1,16 +1,6 @@
 import os
 import pickle
-import numpy as np
-import pandas as pd
-import streamlit as st
-import gdown
-
-# Set webpage tab configurations
-st.set_page_config(page_title="E-Commerce Analytics Engine", layout="wide", page_icon="🛍️")
-
-import os
-import pickle
-import urllib.request
+import requests
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -19,33 +9,45 @@ import streamlit as st
 st.set_page_config(page_title="E-Commerce Analytics Engine", layout="wide", page_icon="🛍️")
 
 # =====================================================================
-# 💾 ROBUST BYPASS-LINK ASSET DOWNLOAD PIPELINE
+# 💾 API-STREAM LARGE FILE DOWNLOAD PIPELINE
 # =====================================================================
 def download_large_gdrive_file(file_id, destination):
-    """Downloads large binaries from GDrive, bypassing the large-file warning page."""
+    """Bulletproof downloader for large Google Drive files bypassing confirmation walls."""
     if not os.path.exists(destination):
-        with st.spinner(f"📥 Downloading required deployment asset: {destination}..."):
-            # The 'confirm=t' flag tells Google to skip the "cannot scan for viruses" HTML screen
-            url = f"https://docs.google.com/uc?export=download&id={file_id}&confirm=t"
+        with st.spinner(f"📥 Streaming large binary model asset: {destination}..."):
+            base_url = "https://docs.google.com/uc?export=download"
+            session = requests.Session()
             
-            # Pretend to be a clean browser request to avoid catching an anti-bot HTML page
-            request_headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
+            # First handshake request
+            response = session.get(base_url, params={'id': file_id}, stream=True)
             
+            # Check for Google's large file virus confirmation token
+            token = None
+            for key, value in response.cookies.items():
+                if key.startswith('download_warning'):
+                    token = value
+                    break
+            
+            # If a confirmation token is detected, dispatch a verified secondary handshake
+            if token:
+                response = session.get(base_url, params={'id': file_id, 'confirm': token}, stream=True)
+            
+            # Stream chunk writer to handle large memory loads cleanly
             try:
-                req = urllib.request.Request(url, headers=request_headers)
-                with urllib.request.urlopen(req) as response, open(destination, 'wb') as out_file:
-                    out_file.write(response.read())
+                with open(destination, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=32768):
+                        if chunk:  # Filter out keep-alive new chunks
+                            f.write(chunk)
+                st.toast(f"✅ Loaded {destination} successfully!")
             except Exception as e:
-                st.error(f"❌ Network download error on {destination}: {e}")
+                st.error(f"❌ Failed writing binary block: {e}")
 
-# Initialize global memory pointers
+# Initialize global memory variables
 loaded_scaler = None
 loaded_kmeans = None
 similarity_matrix = None
 
-# Step 1: Run the raw binary download streaming sequence
+# Step 1: Run the API stream chunk sequence
 try:
     if "gdrive_file_ids" in st.secrets:
         download_large_gdrive_file(st.secrets["gdrive_file_ids"]["scaler_id"], "scaler.pkl")
@@ -60,9 +62,9 @@ except Exception as e:
 @st.cache_resource
 def load_production_artifacts():
     if os.path.exists('scaler.pkl') and os.path.exists('kmeans_model.pkl') and os.path.exists('recommendation_matrix.pkl'):
-        # Check if the file is tiny (corrupted HTML is usually under 50KB, a true matrix is MBs)
-        if os.path.getsize('recommendation_matrix.pkl') < 50000:
-            st.error("❌ The downloaded asset is too small. Google Drive is still serving an HTML page instead of raw bytes.")
+        # Check if file is small (If it's under 100KB, it's a broken HTML file)
+        if os.path.getsize('recommendation_matrix.pkl') < 100000:
+            st.error("❌ The file downloaded is an HTML page error. Please read the troubleshooting steps below.")
             return None, None, None
             
         with open('scaler.pkl', 'rb') as f:
@@ -83,7 +85,14 @@ except Exception as e:
 # Step 3: Global Safety Circuit Breaker
 if loaded_scaler is None or loaded_kmeans is None or similarity_matrix is None:
     st.warning("⚠️ **Application is paused:** The required ML models or recommendation matrices could not be loaded.")
-    st.info("💡 **How to resolve this right now:** Make sure your Google Drive files are set to **'Anyone with the link'** and check that you haven't copied the whole URL into Streamlit secrets, just the string of letters/numbers!")
+    
+    st.markdown("""
+    ### 🛠️ Step-by-Step Fix to Open the App Right Now:
+    
+    1. **Wipe Corrupted Files:** Click **'Manage app'** in the lower right of your Streamlit Cloud dashboard, click the three dots, and click **'Reboot App'**. *This is required to clear out the broken HTML files from memory.*
+    2. **Check Google Drive Access:** Go to Google Drive, right-click `recommendation_matrix.pkl` $\rightarrow$ **Share** $\rightarrow$ change access to **"Anyone with the link"**. If it says *Restricted*, Google will block the download and throw the HTML error page.
+    3. **Verify Alphanumeric ID:** Ensure your secrets panel has *only* the ID token string, not the full `https://...` website address link!
+    """)
     st.stop()
     
 # =====================================================================

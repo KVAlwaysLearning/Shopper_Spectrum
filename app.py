@@ -9,7 +9,7 @@ import streamlit as st
 st.set_page_config(page_title="E-Commerce Analytics Engine", layout="wide", page_icon="🛍️")
 
 # =====================================================================
-# 💾 OPTIMIZED ASSET DOWNLOADER & CACHING PIPELINE
+# 💾 ROBUST ASSET DOWNLOADER & CACHING PIPELINE
 # =====================================================================
 def download_file_from_gdrive(file_id, destination):
     """Downloads a public/shared file from Google Drive via its direct ID."""
@@ -31,31 +31,49 @@ def download_file_from_gdrive(file_id, destination):
                     if chunk: 
                         f.write(chunk)
 
-# Fetch IDs from Streamlit Secrets and run the downloading sequence
+# Initialize variables as None to check status later
+loaded_scaler = None
+loaded_kmeans = None
+similarity_matrix = None
+
+# Step 1: Attempt to download files using credentials from Streamlit Secrets
 try:
-    download_file_from_gdrive(st.secrets["gdrive_file_ids"]["scaler_id"], "scaler.pkl")
-    download_file_from_gdrive(st.secrets["gdrive_file_ids"]["kmeans_id"], "kmeans_model.pkl")
-    download_file_from_gdrive(st.secrets["gdrive_file_ids"]["matrix_id"], "recommendation_matrix.pkl")
+    if "gdrive_file_ids" in st.secrets:
+        download_file_from_gdrive(st.secrets["gdrive_file_ids"]["scaler_id"], "scaler.pkl")
+        download_file_from_gdrive(st.secrets["gdrive_file_ids"]["kmeans_id"], "kmeans_model.pkl")
+        download_file_from_gdrive(st.secrets["gdrive_file_ids"]["matrix_id"], "recommendation_matrix.pkl")
+    else:
+        st.error("❌ 'gdrive_file_ids' section missing from Streamlit Secrets config!")
 except Exception as e:
-    st.error(f"Failed to fetch assets via Streamlit Cloud Secrets. Details: {e}")
+    st.error(f"❌ Failed to download assets from Google Drive. Details: {e}")
 
 # High-efficiency resource caching to prevent performance degradation on state refresh
 @st.cache_resource
 def load_production_artifacts():
-    with open('scaler.pkl', 'rb') as f:
-        scaler = pickle.load(f)
-    with open('kmeans_model.pkl', 'rb') as f:
-        kmeans = pickle.load(f)
-    with open('recommendation_matrix.pkl', 'rb') as f:
-        matrix = pickle.load(f)
-    return scaler, kmeans, matrix
+    # Double-check files actually exist on disk before unpickling
+    if os.path.exists('scaler.pkl') and os.path.exists('kmeans_model.pkl') and os.path.exists('recommendation_matrix.pkl'):
+        with open('scaler.pkl', 'rb') as f:
+            scaler = pickle.load(f)
+        with open('kmeans_model.pkl', 'rb') as f:
+            kmeans = pickle.load(f)
+        with open('recommendation_matrix.pkl', 'rb') as f:
+            matrix = pickle.load(f)
+        return scaler, kmeans, matrix
+    return None, None, None
 
-# Global artifact instantiation
+# Step 2: Try loading the files into operational memory
 try:
     loaded_scaler, loaded_kmeans, similarity_matrix = load_production_artifacts()
 except Exception as e:
-    st.warning("Awaiting download resolution or verification of model pickle assets.")
+    st.error(f"❌ Error loading pickle files into memory: {e}")
 
+# Step 3: Global Safety Guardrail
+# If files are missing, halt application rendering right here and notify the user
+if loaded_scaler is None or loaded_kmeans is None or similarity_matrix is None:
+    st.warning("⚠️ **Application is paused:** The required ML models or recommendation matrices could not be loaded.")
+    st.info("💡 **How to fix this:** Click on **'Manage app'** in the lower right of your Streamlit Cloud dashboard, open the **Secrets** settings panel, and verify your file IDs match your public Google Drive download links perfectly.")
+    st.stop() # Stops execution of the rest of the script cleanly
+    
 # =====================================================================
 # 🧭 SIDEBAR NAVIGATION CONTROLLER (Matching UI Screenshot)
 # =====================================================================

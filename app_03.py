@@ -8,7 +8,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="HALO — E-Commerce Analytics Console", layout="wide", page_icon="🛍️")
 
 # =====================================================================
-# 🧠 EMBEDDED PRODUCTION ML MODEL ARCHITECTURE (UNCHANGED FROM ORIGINAL)
+# 🧠 EMBEDDED PRODUCTION ML MODEL ARCHITECTURE (UNCHANGED)
 # =====================================================================
 MODEL_SCALER_MEAN = np.array([3.8542, 2.1045, 6.1284])   
 MODEL_SCALER_SCALE = np.array([1.1852, 0.9841, 1.3954])  
@@ -127,7 +127,7 @@ def compute_live_recommendation_vector(target_item, search_pool):
     return recommended_items
 
 # =====================================================================
-# 🎨 REACTBITS-STYLE COMPONENT LIBRARY (FIXED RENDER ENGINE)
+# 🎨 UI ARCHITECTURE MODULE (GLOBAL INJECTIONS)
 # =====================================================================
 def inject_global_styles():
     st.markdown("""
@@ -189,11 +189,10 @@ def inject_global_styles():
     }
     @keyframes hbShinySweep{ 0%{background-position:200% center;} 100%{background-position:0% center;} }
     
-    /* STANDARD BOXES */
     .hb-spotlight{ position:relative; border-radius:14px; border:1px solid var(--line); background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); padding:20px 22px; overflow:hidden; transition:transform .3s var(--ease), border-color .3s var(--ease); }
     .hb-spotlight:hover{ transform:translateY(-3px); border-color:rgba(139,124,246,.35); }
     
-    /* ⚡ REACTBITS COMPATIBLE GRADIENT BORDER FRAMEWORK */
+    /* DYNAMIC GRADIENT BORDER FRAMEWORK */
     .hb-animated-border-card {
         position: relative;
         border-radius: 14px;
@@ -202,6 +201,7 @@ def inject_global_styles():
         overflow: hidden;
         z-index: 1;
         box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+        margin-bottom: 20px;
     }
     
     .hb-animated-border-card::before {
@@ -240,7 +240,7 @@ def inject_global_styles():
         100% { transform: rotate(360deg); }
     }
 
-    /* ⚡ PROGRESS GLOW TRACK ENGINE */
+    /* PROGRESS TRACK ENGINE */
     .hb-progress-container {
         margin: 14px 0;
         position: relative;
@@ -279,7 +279,6 @@ def inject_global_styles():
         100% { background-position: -100% 0; }
     }
     
-    /* CONSTELLATION COMPONENTS */
     .hb-orb-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
     .hb-orb{ border-radius:50%; background:radial-gradient(circle at 35% 30%, var(--oc), transparent 70%), var(--oc); box-shadow: 0 0 15px var(--oc); opacity: 0.3; transform: scale(0.95); }
     .hb-orb.active{ opacity:1 !important; transform:scale(1.12) !important; box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25) !important; }
@@ -319,6 +318,9 @@ def inject_global_styles():
     <div class="hb-noise"></div>
     """, unsafe_allow_html=True)
 
+# =====================================================================
+# 🛠️ HELPER ENGINE COMPONENT CALLS
+# =====================================================================
 def split_text(text, tag="h1", extra_class="", delay_step=0.025):
     spans = "".join(f'<span style="animation-delay:{i*delay_step:.3f}s">{("&nbsp;" if ch == " " else ch)}</span>' for i, ch in enumerate(text))
     st.markdown(f'<{tag} class="hb-split {extra_class}">{spans}</{tag}>', unsafe_allow_html=True)
@@ -335,7 +337,6 @@ def eyebrow(text):
 def spotlight_card_html(inner_html):
     st.markdown(f'<div class="hb-spotlight">{inner_html}</div>', unsafe_allow_html=True)
 
-# ⚡ CRITICAL FIX: Explicitly passing unsafe_allow_html=True directly to the function wrapper 
 def animated_border_card_html(inner_html, color_hex="#8b7cf6"):
     st.markdown(f"""
     <div class="hb-animated-border-card" style="--bc: {color_hex};">
@@ -476,7 +477,7 @@ if app_mode == "Home":
     marquee(all_unique_products[:18] if all_unique_products else ["No catalog loaded"])
 
 # =====================================================================
-# 📋 CUSTOMER SEGMENTATION MODULE (FIXED RENDERING)
+# 📋 CUSTOMER SEGMENTATION MODULE
 # =====================================================================
 elif app_mode == "Clustering":
     split_text("Customer Segmentation", tag="h1")
@@ -506,7 +507,7 @@ elif app_mode == "Clustering":
         st.markdown("<br>", unsafe_allow_html=True)
         result_col, orb_col = st.columns([2, 1])
         with result_col:
-            # ⚡ FIXED EXECUTION: Passing HTML inside the function block directly to render cleanly
+            # ⚡ RENDER FIXED: Designed Predicted Segment Element Container
             animated_border_card_html(f"""
             <div class="hb-eyebrow">PREDICTED STRATEGIC COHORT</div>
             <h2 style="margin:8px 0 14px;"><span class="hb-shiny">{resolved_label}</span></h2>
@@ -535,7 +536,7 @@ elif app_mode == "Clustering":
                 """)
 
 # =====================================================================
-# 📊 PRODUCT RECOMMENDATION MODULE (FIXED RENDERING)
+# 📊 PRODUCT RECOMMENDATION MODULE
 # =====================================================================
 elif app_mode == "Recommendation":
     split_text("Product Recommender", tag="h1")
@@ -567,11 +568,11 @@ elif app_mode == "Recommendation":
     if st.session_state.selected_product:
         recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
         
-        # ⚡ FIXED EXECUTION: Fixed standard string passing bug by housing inside automated container
+        # ⚡ RENDER FIXED: Designed Recommended Product Element Container
         animated_border_card_html(f"""
         <div class="hb-eyebrow">RECOMMENDED CO-PURCHASED PRODUCTS FOR:</div>
         <h3 style="margin:6px 0 12px; color:var(--text); font-family:'Space Grotesk',sans-serif;">{st.session_state.selected_product}</h3>
-        """, color_hex="var(--violet)")
+        """, color_hex="#8b7cf6")
         
         st.markdown("<br>", unsafe_allow_html=True)
         for item in recommendations:

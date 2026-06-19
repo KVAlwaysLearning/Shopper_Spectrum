@@ -8,7 +8,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="HALO — E-Commerce Analytics Console", layout="wide", page_icon="🛍️")
 
 # =====================================================================
-# 🧠 EMBEDDED PRODUCTION ML MODEL ARCHITECTURE  (UNCHANGED FROM ORIGINAL)
+# 🧠 EMBEDDED PRODUCTION ML MODEL ARCHITECTURE (UNCHANGED FROM ORIGINAL)
 # =====================================================================
 MODEL_SCALER_MEAN = np.array([3.8542, 2.1045, 6.1284])   
 MODEL_SCALER_SCALE = np.array([1.1852, 0.9841, 1.3954])  
@@ -37,35 +37,7 @@ SEGMENT_COLOR_MAP = {
 # =====================================================================
 # 🧠 HYBRID DATA SCALING & MODEL-FIRST ENHANCED SEGMENTATION ENGINE
 # =====================================================================
-METRIC_LIMITS = {
-    "High-Value Hero": {
-        "recency": {"min": 0, "max": 60, "unit": "days"},
-        "frequency": {"min": 12, "max": 10000, "unit": "orders"},
-        "monetary": {"min": 3000.0, "max": 5000000.0, "unit": "£"}
-    },
-    "Regular Loyalist": {
-        "recency": {"min": 0, "max": 180, "unit": "days"},
-        "frequency": {"min": 3, "max": 10000, "unit": "orders"},
-        "monetary": {"min": 100.0, "max": 5000000.0, "unit": "£"}
-    },
-    "Occasional Shopper": {
-        "recency": {"min": 0, "max": 365, "unit": "days"},
-        "frequency": {"min": 1, "max": 4, "unit": "orders"},
-        "monetary": {"min": 0.0, "max": 500.0, "unit": "£"}
-    },
-    "At-Risk Account": {
-        "recency": {"min": 90, "max": 2000, "unit": "days"},
-        "frequency": {"min": 1, "max": 10, "unit": "orders"},
-        "monetary": {"min": 0.0, "max": 5000000.0, "unit": "£"}
-    }
-}
-
 def predict_and_calibrate_segment(recency, frequency, monetary):
-    """
-    Executes customer segmentation analysis:
-    1. Scales the raw behavior variables (log1p shift + mean-variance normalization)
-    2. Runs model first, then applies limit overrides to resolve edge cases.
-    """
     raw_features = np.array([float(recency), float(frequency), float(monetary)])
     log_features = np.log1p(raw_features)
     scaled_features = (log_features - MODEL_SCALER_MEAN) / MODEL_SCALER_SCALE
@@ -110,7 +82,6 @@ def predict_and_calibrate_segment(recency, frequency, monetary):
 # =====================================================================
 @st.cache_resource
 def load_cleaned_description_catalog():
-    """Parses description.csv file to construct the master A-Z index maps."""
     csv_filename = "description.csv"
     fallback_items = ["BLUE VINTAGE SPOT BEAKER", "GREEN VINTAGE SPOT BEAKER", "WHITE HANGING HEART T-LIGHT HOLDER"]
     fallback_index = {"B": ["BLUE VINTAGE SPOT BEAKER"], "G": ["GREEN VINTAGE SPOT BEAKER"], "W": ["WHITE HANGING HEART T-LIGHT HOLDER"]}
@@ -141,7 +112,6 @@ all_unique_products, catalog_alphabet_index = load_cleaned_description_catalog()
 # =====================================================================
 @st.cache_resource
 def compute_live_recommendation_vector(target_item, search_pool):
-    """Calculates matching item recommendations dynamically."""
     hash_value = sum(ord(char) for char in target_item)
     np.random.seed(hash_value % 4294967295)
     pool_size = min(6, len(search_pool))
@@ -154,10 +124,9 @@ def compute_live_recommendation_vector(target_item, search_pool):
     return recommended_items
 
 # =====================================================================
-# 🎨 REACTBITS-STYLE COMPONENT LIBRARY
+# 🎨 REACTBITS-STYLE COMPONENT LIBRARY (UPGRADED CSS ENGINE)
 # =====================================================================
 def inject_global_styles():
-    """One-time global <style> block: tokens + every animated CSS component."""
     st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=500;600;700&family=Inter:wght=400;500;600&family=JetBrains+Mono:wght=400;500&display=swap');
@@ -178,44 +147,18 @@ def inject_global_styles():
         --ease:cubic-bezier(.22,1,.36,1);
     }
     
-    html, body, [class*="css"]{
-        font-family:'Inter',sans-serif;
-    }
-    .stApp{
-        background:var(--bg);
-        color:var(--text);
-    }
-    section[data-testid="stSidebar"]{
-        background:rgba(12,11,20,0.85);
-        border-right:1px solid var(--line);
-    }
-    h1,h2,h3,h4{
-        font-family:'Space Grotesk',sans-serif !important;
-    }
-    code, .mono{
-        font-family:'JetBrains Mono',monospace;
-    }
+    html, body, [class*="css"]{ font-family:'Inter',sans-serif; }
+    .stApp{ background:var(--bg); color:var(--text); }
+    section[data-testid="stSidebar"]{ background:rgba(12,11,20,0.85); border-right:1px solid var(--line); }
+    h1,h2,h3,h4{ font-family:'Space Grotesk',sans-serif !important; }
+    code, .mono{ font-family:'JetBrains Mono',monospace; }
     
-    /* ---------- AURORA ANIMATED BACKDROP ---------- */
-    .hb-aurora{
-        position:fixed;
-        inset:0;
-        z-index:-1;
-        overflow:hidden;
-        pointer-events:none;
-    }
-    .hb-aurora span{
-        position:absolute;
-        width:55vw;
-        height:55vw;
-        border-radius:50%;
-        filter:blur(90px);
-        opacity:.30;
-    }
+    /* AURORA BACKGROUNDS */
+    .hb-aurora{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
+    .hb-aurora span{ position:absolute; width:55vw; height:55vw; border-radius:50%; filter:blur(90px); opacity:.30; }
     .hb-aurora .a1{ background:radial-gradient(circle,var(--violet),transparent 70%); top:-18%; left:-8%; animation:hbDrift1 26s ease-in-out infinite; }
     .hb-aurora .a2{ background:radial-gradient(circle,var(--hero-green),transparent 70%); top:6%; right:-14%; opacity:.16; animation:hbDrift2 32s ease-in-out infinite; }
     .hb-aurora .a3{ background:radial-gradient(circle,var(--amber),transparent 70%); bottom:-22%; left:18%; opacity:.14; animation:hbDrift3 38s ease-in-out infinite; }
-    
     @keyframes hbDrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(6%,5%) scale(1.1)}}
     @keyframes hbDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-8%,6%) scale(1.06)}}
     @keyframes hbDrift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(5%,-8%) scale(1.12)}}
@@ -225,7 +168,7 @@ def inject_global_styles():
     .hb-noise{ position:fixed; inset:0; z-index:999; pointer-events:none; opacity:.035; mix-blend-mode:overlay; background-image:radial-gradient(rgba(255,255,255,.6) 1px, transparent 1px); background-size:3px 3px; }
     @keyframes hbTwinkle{0%,100%{opacity:.1}50%{opacity:.5}}
     
-    /* ---------- TEXT EFFECT WORKOUTS ---------- */
+    /* ANIMATIONS AND FONTS */
     .hb-split span{ display:inline-block; opacity:0; transform:translateY(.6em); animation:hbRise .6s var(--ease) forwards; }
     @keyframes hbRise{ to{opacity:1; transform:translateY(0);} }
     .hb-blur{ display:inline-block; filter:blur(8px); opacity:0; transform:translateY(6px); animation:hbBlurIn .7s var(--ease) forwards; }
@@ -235,66 +178,106 @@ def inject_global_styles():
     .hb-shiny{ background:linear-gradient(100deg,var(--text-dim) 35%,var(--text) 50%,var(--text-dim) 65%); background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation:hbShinySweep 3.2s linear infinite; }
     @keyframes hbShinySweep{ 0%{background-position:120% center;} 100%{background-position:-20% center;} }
     
-    /* ---------- CARDS AND STRUCTURES ---------- */
+    /* CARDS */
     .hb-glass{ background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); border:1px solid var(--line); border-radius:14px; padding:20px 22px; backdrop-filter:blur(14px); }
     .hb-spotlight{ position:relative; border-radius:14px; border:1px solid var(--line); background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); padding:20px 22px; overflow:hidden; transition:transform .3s var(--ease), border-color .3s var(--ease); }
     .hb-spotlight:hover{ transform:translateY(-3px); border-color:rgba(139,124,246,.35); }
     .hb-spotlight::before{ content:""; position:absolute; inset:0; opacity:0; transition:opacity .3s var(--ease); background:radial-gradient(220px circle at 50% 0%, rgba(139,124,246,.18), transparent 70%); }
     .hb-spotlight:hover::before{ opacity:1; }
-    .hb-border-card{ position:relative; border-radius:14px; padding:20px 22px; background:var(--bg-elev); }
-    .hb-border-card::before{ content:""; position:absolute; inset:0; border-radius:14px; padding:1px; background:linear-gradient(120deg,var(--violet),transparent 40%, var(--hero-green) 80%); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
     
-    /* ---------- 🔄 REBUILT SEQUENTIAL BLINKING ORB CONSTELLATION ---------- */
+    /* ⚡ REACTBITS INTERACTIVE ANIMATED BORDER ELEMENT */
+    .hb-animated-border-card {
+        position: relative;
+        border-radius: 14px;
+        padding: 24px;
+        background: var(--bg-elev);
+        overflow: hidden;
+        z-index: 1;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        animation: hbIntroCard 0.6s var(--ease) forwards;
+    }
+    .hb-animated-border-card::before {
+        content: "";
+        position: absolute;
+        z-index: -2;
+        left: -50%;
+        top: -50%;
+        width: 200%;
+        height: 200%;
+        background-color: transparent;
+        background-repeat: no-repeat;
+        background-size: 50% 50%, 50% 50%;
+        background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+        background-image: conic-gradient(from var(--border-angle, 0deg), var(--bc, var(--violet)), transparent 60%, var(--bc, var(--violet)));
+        animation: hbRotateBorder 4s linear infinite;
+    }
+    .hb-animated-border-card::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        left: 2px;
+        top: 2px;
+        width: calc(100% - 4px);
+        height: calc(100% - 4px);
+        background: var(--bg-elev);
+        border-radius: 12px;
+    }
+    
+    @property --border-angle {
+        syntax: '<angle>';
+        initial-value: 0deg;
+        inherits: false;
+    }
+    @keyframes hbRotateBorder {
+        100% { --border-angle: 360deg; }
+    }
+    @keyframes hbIntroCard {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ⚡ UPGRADED PROGRESS GLOW FILL BAR */
+    .hb-progress-track{ width:100%; height:10px; border-radius:6px; background:var(--bg-elev-2); overflow:hidden; position:relative; }
+    .hb-progress-fill{ 
+        height:100%; 
+        border-radius:6px; 
+        transform-origin:left;
+        animation: hbFillScale 1.4s cubic-bezier(.19,1,.22,1) forwards;
+        position: relative;
+    }
+    .hb-progress-fill::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+        transform: translateX(-100%);
+        animation: hbShimmerBar 2s infinite linear;
+    }
+    @keyframes hbFillScale {
+        from { transform: scaleX(0); }
+        to { transform: scaleX(1); }
+    }
+    @keyframes hbShimmerBar {
+        100% { transform: translateX(100%); }
+    }
+    
+    /* ORBS ELEMENT CONSTELLATION */
     .hb-orb-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
-    .hb-orb{
-        border-radius:50%;
-        background:radial-gradient(circle at 35% 30%, var(--oc), transparent 70%), var(--oc);
-        box-shadow: 0 0 15px var(--oc);
-        opacity: 0.3;
-        transform: scale(0.95);
-    }
+    .hb-orb{ border-radius:50%; background:radial-gradient(circle at 35% 30%, var(--oc), transparent 70%), var(--oc); box-shadow: 0 0 15px var(--oc); opacity: 0.3; transform: scale(0.95); }
+    .hb-orb.active{ opacity:1 !important; transform:scale(1.12) !important; box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25) !important; animation: none !important; }
     
-    /* Active override state used on metrics tab outputs */
-    .hb-orb.active{
-        opacity:1 !important;
-        transform:scale(1.12) !important;
-        box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25) !important;
-        animation: none !important;
-    }
-    
-    /* 8-second total timeline split across 4 nodes (2s focus window each) */
     .hb-orb-seq-0 { animation: hbSeqBlink0 8s infinite ease-in-out; }
     .hb-orb-seq-1 { animation: hbSeqBlink1 8s infinite ease-in-out; }
     .hb-orb-seq-2 { animation: hbSeqBlink2 8s infinite ease-in-out; }
     .hb-orb-seq-3 { animation: hbSeqBlink3 8s infinite ease-in-out; }
-    
-    @keyframes hbSeqBlink0 {
-        0%, 20%   { opacity: 1; transform: scale(1.12); box-shadow: 0 0 40px var(--oc), inset 0 0 15px rgba(255,255,255,0.2); }
-        25%, 100% { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); }
-    }
-    @keyframes hbSeqBlink1 {
-        0%, 20%   { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); }
-        25%, 45%  { opacity: 1; transform: scale(1.12); box-shadow: 0 0 40px var(--oc), inset 0 0 15px rgba(255,255,255,0.2); }
-        50%, 100% { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); }
-    }
-    @keyframes hbSeqBlink2 {
-        0%, 45%   { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); }
-        50%, 70%  { opacity: 1; transform: scale(1.12); box-shadow: 0 0 40px var(--oc), inset 0 0 15px rgba(255,255,255,0.2); }
-        75%, 100% { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); }
-    }
-    @keyframes hbSeqBlink3 {
-        0%, 70%   { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); }
-        75%, 95%  { opacity: 1; transform: scale(1.12); box-shadow: 0 0 40px var(--oc), inset 0 0 15px rgba(255,255,255,0.2); }
-        100%      { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); }
-    }
+    @keyframes hbSeqBlink0 { 0%, 20% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 40px var(--oc); } 25%, 100% { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); } }
+    @keyframes hbSeqBlink1 { 0%, 20% { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); } 25%, 45% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 40px var(--oc); } 50%, 100% { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); } }
+    @keyframes hbSeqBlink2 { 0%, 45% { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); } 50%, 70% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 40px var(--oc); } 75%, 100% { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); } }
+    @keyframes hbSeqBlink3 { 0%, 70% { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); } 75%, 95% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 40px var(--oc); } 100% { opacity: 0.3; transform: scale(0.95); box-shadow: 0 0 12px var(--oc); } }
     
     .hb-orb-label{ font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--text-muted); text-align:center; }
     .hb-status-dot{ width:7px; height:7px; border-radius:50%; background:var(--hero-green); box-shadow:0 0 8px var(--hero-green); display:inline-block; margin-right:6px; animation:hbBlink 2s ease-in-out infinite; }
     @keyframes hbBlink{ 50%{opacity:.35;} }
-    
-    .hb-progress-track{ width:100%; height:8px; border-radius:6px; background:var(--bg-elev-2); overflow:hidden; }
-    .hb-progress-fill{ height:100%; border-radius:6px; background:linear-gradient(90deg,var(--violet),var(--hero-green)); animation:hbFillIn 1.1s var(--ease) forwards; transform-origin:left; }
-    @keyframes hbFillIn{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
     
     .hb-eyebrow{ font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); }
     .hb-marquee{ overflow:hidden; -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent); mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent); }
@@ -334,18 +317,20 @@ def shiny_text(text, tag="span", extra_class=""):
 def eyebrow(text):
     st.markdown(f'<div class="hb-eyebrow">{text}</div>', unsafe_allow_html=True)
 
-def spotlight_card_html(inner_html):
-    st.markdown(f'<div class="hb-spotlight">{inner_html}</div>', unsafe_allow_html=True)
-
-def border_card_html(inner_html):
-    st.markdown(f'<div class="hb-border-card">{inner_html}</div>', unsafe_allow_html=True)
+# ⚡ REACTBITS REBUILT ANIMATED CARD WRAPPER WITH CONFIGURABLE BORDER COLOR VARIABLE
+def animated_border_card_html(inner_html, color_hex="#8b7cf6"):
+    st.markdown(f"""
+    <div class="hb-animated-border-card" style="--bc: {color_hex};">
+        {inner_html}
+    </div>
+    """, unsafe_allow_html=True)
 
 def orb(color, label, active=False, size=70, loop_idx=None):
     if loop_idx is not None:
         cls = f"hb-orb hb-orb-seq-{loop_idx}"
         style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
     else:
-        cls = "hb-orb active" if active else "hb-orb"
+        cls = "hb-orb active"
         style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
     st.markdown(f"""
     <div class="hb-orb-wrap">
@@ -426,7 +411,6 @@ with st.sidebar:
     st.markdown('<div class="hb-eyebrow" style="margin-bottom:6px;">◐ HALO CONSOLE</div>', unsafe_allow_html=True)
     st.markdown('<h3 style="margin-top:0;">Navigation</h3>', unsafe_allow_html=True)
     
-    # Normalized strings (no emojis) to prevent route matching failures
     app_mode = st.radio(
         "Go To Page:",
         ["Home", "Clustering", "Recommendation"],
@@ -457,7 +441,6 @@ if app_mode == "Home":
     orb_cols = st.columns(4)
     for i, col in enumerate(orb_cols):
         with col:
-            # loop_idx activates sequential CSS timing offsets
             orb(SEGMENT_COLOR_MAP[i], BUSINESS_SEGMENT_MAP[i], size=70, loop_idx=i)
             
     st.markdown("<br>", unsafe_allow_html=True)
@@ -473,7 +456,7 @@ if app_mode == "Home":
     marquee(all_unique_products[:18] if all_unique_products else ["No catalog loaded"])
 
 # =====================================================================
-# 📋 CUSTOMER SEGMENTATION MODULE
+# 📋 CUSTOMER SEGMENTATION MODULE (UPGRADED RESULT RENDER)
 # =====================================================================
 elif app_mode == "Clustering":
     split_text("Customer Segmentation", tag="h1")
@@ -503,12 +486,16 @@ elif app_mode == "Clustering":
         st.markdown("<br>", unsafe_allow_html=True)
         result_col, orb_col = st.columns([2, 1])
         with result_col:
-            border_card_html(f"""
+            # ⚡ UPGRADED: Core ReactBits Moving Border integration synced with segment context color
+            animated_border_card_html(f"""
             <div class="hb-eyebrow">PREDICTED STRATEGIC COHORT</div>
             <h2 style="margin:8px 0 14px;">{shiny_text(resolved_label)}</h2>
-            """)
+            """, color_hex=seg_color)
+            
             decrypt_text_widget(resolved_label, height=38, font_size=20, color=seg_color)
             st.markdown(f'<div style="margin-top:10px; color:var(--text-dim); font-size:13px;">Relative confidence vs. nearest competing cluster</div>', unsafe_allow_html=True)
+            
+            # ⚡ UPGRADED: Enhanced confidence tracker bar with loading shimmers
             progress_glow(confidence_pct, color_from=seg_color, color_to="var(--hero-green)")
             st.markdown(f'<div style="text-align:right; font-family:JetBrains Mono,monospace; font-size:12px; color:var(--text-dim); margin-top:4px;">{confidence_pct}%</div>', unsafe_allow_html=True)
         with orb_col:
@@ -529,7 +516,7 @@ elif app_mode == "Clustering":
                 """)
 
 # =====================================================================
-# 📊 PRODUCT RECOMMENDATION MODULE
+# 📊 PRODUCT RECOMMENDATION MODULE (UPGRADED CARD RENDER)
 # =====================================================================
 elif app_mode == "Recommendation":
     split_text("Product Recommender", tag="h1")
@@ -560,10 +547,14 @@ elif app_mode == "Recommendation":
 
     if st.session_state.selected_product:
         recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
-        border_card_html(f"""
+        
+        # ⚡ UPGRADED: Replaced static block with an animated sweeping gradient border
+        animated_border_card_html(f"""
         <div class="hb-eyebrow">RECOMMENDED CO-PURCHASED PRODUCTS FOR:</div>
-        <h3 style="margin:6px 0 12px; color:var(--violet);">{st.session_state.selected_product}</h3>
-        """)
+        <h3 style="margin:6px 0 12px; color:var(--text); font-family:'Space Grotesk',sans-serif;">{st.session_state.selected_product}</h3>
+        """, color_hex="var(--violet)")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
         for item in recommendations:
             st.markdown(f"✨ {item}")
 
@@ -587,17 +578,17 @@ elif app_mode == "Recommendation":
         
         with col_left:
             for item in filtered_products[0 : items_per_column]:
-                if st.button(f"📖 {item}", key=f"dir_lnk_{item}", use_container_width=True):
+                if st.button("📖 " + item, key=f"dir_lnk_{item}", use_container_width=True):
                     st.session_state.selected_product = item
                     st.rerun()
         with col_mid:
             for item in filtered_products[items_per_column : items_per_column * 2]:
-                if st.button(f"📖 {item}", key=f"dir_lnk_{item}", use_container_width=True):
+                if st.button("📖 " + item, key=f"dir_lnk_{item}", use_container_width=True):
                     st.session_state.selected_product = item
                     st.rerun()
         with col_right:
             for item in filtered_products[items_per_column * 2 : ]:
-                if st.button(f"📖 {item}", key=f"dir_lnk_{item}", use_container_width=True):
+                if st.button("📖 " + item, key=f"dir_lnk_{item}", use_container_width=True):
                     st.session_state.selected_product = item
                     st.rerun()
     else:

@@ -128,7 +128,7 @@ def compute_live_recommendation_vector(target_item, search_pool):
     return recommended_items
 
 # =====================================================================
-# 🎨 UI STYLING ARCHITECTURE MODULE
+# 🎨 UI STYLING ARCHITECTURE MODULE (FIXED ANIMATED TEXT FIELDS)
 # =====================================================================
 def inject_global_styles():
     st.markdown("""
@@ -157,15 +157,31 @@ def inject_global_styles():
     h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif !important; color:var(--text); }
     code, .mono { font-family:'JetBrains Mono',monospace; }
 
-    /* Fix text visibility inside inputs, dropdown selections, and numbers */
-    div[data-baseweb="select"] *, div[data-baseweb="input"] *, .stNumberInput input, .stSelectbox div {
+    /* Animated Text Box Controls - Scoped Specifically to Labels, Values and Focus Rules */
+    .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
         color: #ffffff !important;
+        transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease) !important;
     }
     
-    /* Active list dropdown popover containers fix */
-    ul[role="listbox"] li, ul[role="listbox"] div {
-        color: #ffffff !important;
+    div[data-baseweb="input"] input:focus, div[data-baseweb="select"]:focus-within {
+        transform: translateY(-1px);
+        border-color: rgba(139,124,246, 0.6) !important;
+        box-shadow: 0 0 12px rgba(139,124,246, 0.25) !important;
+    }
+    
+    /* Smooth Active selection tracking list popover */
+    ul[role="listbox"] {
         background-color: var(--bg-elev-2) !important;
+        border: 1px solid var(--line) !important;
+        transition: all 0.2s var(--ease);
+    }
+    ul[role="listbox"] li {
+        color: #ffffff !important;
+        transition: background 0.15s var(--ease), padding-left 0.15s var(--ease) !important;
+    }
+    ul[role="listbox"] li:hover {
+        background-color: rgba(139,124,246, 0.15) !important;
+        padding-left: 20px !important;
     }
 
     /* ---------- AURORA BACKGROUNDS ---------- */

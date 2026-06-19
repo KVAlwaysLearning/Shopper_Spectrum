@@ -157,7 +157,7 @@ def inject_global_styles():
     h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif !important; color:var(--text); }
     code, .mono { font-family:'JetBrains Mono',monospace; }
 
-    /* RFM & Text Box Inputs Configuration: Font color changed from White to Black */
+    /* RFM Inputs Configuration: Text color changed from White to Black */
     .stNumberInput input {
         color: #000000 !important;
         font-weight: 600 !important;
@@ -190,41 +190,25 @@ def inject_global_styles():
         padding-left: 20px !important;
     }
 
-    /* ---------- DYNAMIC TILT & DISTORT ANIMATION ---------- */
-    .hb-tilt-card {
+    /* ---------- INTERACTIVE HOVER 3D TILT & SHAPE MORPH ---------- */
+    .hb-tilt-hover-card {
         position: relative;
         background: var(--bg-elev);
-        padding: 22px 24px;
+        padding: 24px;
         margin-bottom: 15px;
         border: 1px solid rgba(243,241,236,0.12);
+        border-radius: 14px;
         perspective: 1000px;
-        animation: hbTiltDistort 1.2s var(--ease) forwards;
         transform-style: preserve-3d;
+        transition: transform 0.5s var(--ease), border-color 0.5s var(--ease), border-radius 0.5s var(--ease), box-shadow 0.5s var(--ease);
     }
 
-    @keyframes hbTiltDistort {
-        0% {
-            transform: rotateX(0deg) rotateY(0deg) scale(0.92);
-            border-radius: 14px;
-            border-color: rgba(243,241,236,0.1);
-            box-shadow: 0 0 0 rgba(0,0,0,0);
-        }
-        30% {
-            transform: rotateX(12deg) rotateY(-8deg) scale(1.02);
-            border-radius: 24px 8px 24px 12px; /* Fluid shifting shape */
-            border-color: var(--brc);
-            box-shadow: -10px 15px 30px rgba(0,0,0,0.5), 0 0 20px var(--brc);
-        }
-        60% {
-            transform: rotateX(-5deg) rotateY(6deg) scale(0.99);
-            border-radius: 10px 20px 12px 24px;
-        }
-        100% {
-            transform: rotateX(0deg) rotateY(0deg) scale(1);
-            border-radius: 16px; /* Final polished container shape */
-            border-color: var(--brc);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-        }
+    /* Interactive Hover Rules for Shape Alteration and Tilting */
+    .hb-tilt-hover-card:hover {
+        transform: rotateX(7deg) rotateY(-5deg) translateY(-4px) scale(1.02);
+        border-radius: 24px 8px 32px 14px; /* Organic shape distortion */
+        border-color: var(--brc) !important;
+        box-shadow: -8px 12px 28px rgba(0,0,0,0.45), 0 0 22px rgba(139,124,246,0.15);
     }
 
     /* ---------- AURORA BACKGROUNDS ---------- */
@@ -306,7 +290,7 @@ def inject_global_styles():
     <div class="hb-noise"></div>
     """, unsafe_allow_html=True)
 
-def split_text(text, tag="h1", extra_class="", delay_step=0.025):
+def split_text(text, tag="h1", extra_class="", delay_step=0.03):
     spans = "".join(f'<span style="animation-delay:{i*delay_step:.3f}s">{("&nbsp;" if ch == " " else ch)}</span>' for i, ch in enumerate(text))
     st.markdown(f'<{tag} class="hb-split {extra_class}">{spans}</{tag}>', unsafe_allow_html=True)
 
@@ -325,8 +309,8 @@ def eyebrow(text):
 def spotlight_card_html(inner_html):
     st.markdown(f'<div class="hb-spotlight">{inner_html}</div>', unsafe_allow_html=True)
 
-def animated_tilt_card(inner_html, highlight_color="var(--violet)"):
-    st.markdown(f'<div class="hb-tilt-card" style="--brc:{highlight_color};">{inner_html}</div>', unsafe_allow_html=True)
+def interactive_hover_tilt_card(inner_html, highlight_color="var(--violet)"):
+    st.markdown(f'<div class="hb-tilt-hover-card" style="--brc:{highlight_color};">{inner_html}</div>', unsafe_allow_html=True)
 
 def status_pill(text):
     st.markdown(f'<div class="hb-eyebrow"><span class="hb-status-dot"></span>{text}</div>', unsafe_allow_html=True)
@@ -462,6 +446,7 @@ if app_mode == "Home":
 # 📋 CUSTOMER SEGMENTATION MODULE
 # =====================================================================
 elif app_mode == "Clustering":
+    # Activated dynamic text animation reveal for the main segmentation header
     split_text("Customer Segmentation", tag="h1")
     blur_text("Determine a customer's strategic group instantly by updating their active behavior variables below:")
 
@@ -491,8 +476,8 @@ elif app_mode == "Clustering":
         result_col, orb_col = st.columns([2, 1])
 
         with result_col:
-            # Replaced with the responsive dynamic structural transformation panel
-            animated_tilt_card(f"""
+            # Replaced with the interactive 3D Hover Tilt and Morphing panel framework
+            interactive_hover_tilt_card(f"""
                 <div class="hb-eyebrow">PREDICTED STRATEGIC COHORT</div>
                 <h2 style="margin:8px 0 14px;">{shiny_text(resolved_label)}</h2>
             """, highlight_color=seg_color)
@@ -550,8 +535,8 @@ elif app_mode == "Recommendation":
     if st.session_state.selected_product:
         recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
         
-        # Replaced with the responsive dynamic structural transformation panel
-        animated_tilt_card(f"""
+        # Replaced with the interactive 3D Hover Tilt and Morphing panel framework
+        interactive_hover_tilt_card(f"""
             <div class="hb-eyebrow">RECOMMENDED CO-PURCHASED PRODUCTS FOR:</div>
             <h3 style="margin:8px 0 14px;">{st.session_state.selected_product}</h3>
         """, highlight_color="var(--violet)")

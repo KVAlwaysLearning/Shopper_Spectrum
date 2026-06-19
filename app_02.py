@@ -434,7 +434,9 @@ if app_mode == "🏠​ Home":
     ], height=40, font_size=18)
 
     blur_text(
-        "Interactive Dashboard Covering All Products!!\n"
+        "Interactive Dashboard Covering All Products!!",
+        "
+        "
         "Machine Learning Model based Customer Segmentation",
         tag="p", extra_class=""
     )

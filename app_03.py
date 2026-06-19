@@ -532,4 +532,67 @@ elif app_mode == "Recommendation":
         st.session_state.active_letter = "A"
 
     try:
-        default_index = all_unique_products.index(st.session_state.selected
+        default_index = all_unique_products.index(st.session_state.selected_product)
+    except ValueError:
+        default_index = 0
+
+    search_query = st.selectbox(
+        "Enter Product Name",
+        options=all_unique_products,
+        index=default_index
+    )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Get Recommendations", type="primary"):
+        st.session_state.selected_product = search_query
+        st.rerun()
+
+    if st.session_state.selected_product:
+        recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
+        
+        # Replaced with the responsive dynamic structural transformation panel
+        animated_tilt_card(f"""
+            <div class="hb-eyebrow">RECOMMENDED CO-PURCHASED PRODUCTS FOR:</div>
+            <h3 style="margin:8px 0 14px;">{st.session_state.selected_product}</h3>
+        """, highlight_color="var(--violet)")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        for item in recommendations:
+            st.markdown(f"✨ **{item}**")
+
+    st.markdown("<br><br><br>", unsafe_allow_html=True)
+    eyebrow("BROWSE CATALOG INTERACTIVELY")
+
+    alphabet_keys = sorted(list(catalog_alphabet_index.keys()))
+    if alphabet_keys:
+        letter_columns = st.columns(len(alphabet_keys))
+        for idx, letter in enumerate(alphabet_keys):
+            with letter_columns[idx]:
+                b_type = "primary" if st.session_state.active_letter == letter else "secondary"
+                if st.button(letter, key=f"btn_let_{letter}", type=b_type, use_container_width=True):
+                    st.session_state.active_letter = letter
+                    st.rerun()
+
+        filtered_products = catalog_alphabet_index.get(st.session_state.active_letter, [])
+        if filtered_products:
+            total_items = len(filtered_products)
+            items_per_column = int(np.ceil(total_items / 3))
+            col_left, col_mid, col_right = st.columns(3)
+
+            with col_left:
+                for item in filtered_products[0:items_per_column]:
+                    if st.button("📖 " + item, key=f"dir_lnk_{item}", use_container_width=True):
+                        st.session_state.selected_product = item
+                        st.rerun()
+            with col_mid:
+                for item in filtered_products[items_per_column : items_per_column * 2]:
+                    if st.button("📖 " + item, key=f"dir_lnk_{item}", use_container_width=True):
+                        st.session_state.selected_product = item
+                        st.rerun()
+            with col_right:
+                for item in filtered_products[items_per_column * 2 :]:
+                    if st.button("📖 " + item, key=f"dir_lnk_{item}", use_container_width=True):
+                        st.session_state.selected_product = item
+                        st.rerun()
+        else:
+            st.write("*No products found matching this filter letter.*")

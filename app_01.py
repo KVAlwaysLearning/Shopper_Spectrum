@@ -106,7 +106,7 @@ with st.sidebar:
 # =====================================================================
 # 🏠 HOME PAGE MODULE
 # =====================================================================
-if app_mode == "🏠 Home":
+if app_mode == "🏠​ Home":
     st.title("🚀 Enterprise Customer Analytics Dashboard")
     st.markdown(f"""
     Welcome to your real-time customer data management console. This interface utilizes your 

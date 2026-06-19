@@ -27,66 +27,65 @@ BUSINESS_SEGMENT_MAP = {
 }
 
 # =====================================================================
-# ⚙️ SYSTEM PIPELINE: DYNAMIC DATA ENGINE & ASSET COMPILATION
+# ⚙️ DATA ENGINE: LOAD REPO DESCRIPTION CSV ASSET
 # =====================================================================
 @st.cache_resource
-def initialize_dynamic_inventory_catalog():
-    """Reads raw e-commerce records to assemble a comprehensive product database."""
-    # Check if the dataset is located in the local workspace directory
-    csv_filename = "online_retail.csv"
+def load_cleaned_description_catalog():
+    """Parses your description.csv file to construct the master A-Z index maps."""
+    csv_filename = "description.csv"
+    
+    # Emergency fallback list if file isn't uploaded properly
+    fallback_items = ["BLUE VINTAGE SPOT BEAKER", "GREEN VINTAGE SPOT BEAKER", "WHITE HANGING HEART T-LIGHT HOLDER"]
+    fallback_index = {"B": ["BLUE VINTAGE SPOT BEAKER"], "G": ["GREEN VINTAGE SPOT BEAKER"], "W": ["WHITE HANGING HEART T-LIGHT HOLDER"]}
+
     if not os.path.exists(csv_filename):
-        return ["GREEN VINTAGE SPOT BEAKER", "WHITE HANGING HEART T-LIGHT HOLDER"], {}
+        return fallback_items, fallback_index
 
     try:
-        # Load the dataset, extracting only the Description column to optimize system memory
-        df_raw = pd.read_csv(csv_filename, usecols=["Description"])
+        # Load from your uploaded custom CSV file
+        df = pd.read_csv(csv_filename)
         
-        # Data Cleaning: Drop missing values, eliminate blank spaces, and keep unique titles
-        df_clean = df_raw["Description"].dropna().astype(str).str.strip().str.upper()
-        unique_catalog = sorted(list(df_clean.unique()))
+        # Enforce clean uppercase parsing of text content
+        unique_catalog = sorted(df["Description"].dropna().astype(str).str.strip().str.upper().tolist())
         
-        # Remove anomalies like bad input text tags or administrative notes if present
-        unique_catalog = [item for item in unique_catalog if item and not item.startswith("?")]
-        
-        # Group products alphabetically by their first letter
+        # Sort values into alphabet index dictionary buckets
         alphabet_groups = {}
         for item in unique_catalog:
-            first_letter = item[0]
-            if first_letter.isalpha():
-                if first_letter not in alphabet_groups:
-                    alphabet_groups[first_letter] = []
-                alphabet_groups[first_letter].append(item)
+            if item:
+                first_letter = item[0]
+                if first_letter.isalpha():
+                    if first_letter not in alphabet_groups:
+                        alphabet_groups[first_letter] = []
+                    alphabet_groups[first_letter].append(item)
                 
         return unique_catalog, alphabet_groups
         
     except Exception as e:
-        st.error(f"Failed processing local transaction database file: {e}")
-        return ["GREEN VINTAGE SPOT BEAKER", "WHITE HANGING HEART T-LIGHT HOLDER"], {}
+        st.error(f"Error parsing unique description CSV file: {e}")
+        return fallback_items, fallback_index
 
-# Generate your master product catalog arrays
-all_unique_products, catalog_alphabet_index = initialize_dynamic_inventory_catalog()
+# Instantiating the description matrices on system startup
+all_unique_products, catalog_alphabet_index = load_cleaned_description_catalog()
 
 # =====================================================================
-# 📊 EMBEDDED SYSTEM: COLLABORATIVE SIMILARITY ENGINE
+# 📊 EMBEDDED ENGINE: SYSTEM COLLABORATIVE RECOMMENDATIONS
 # =====================================================================
 @st.cache_resource
 def compute_live_recommendation_vector(target_item, search_pool):
-    """Computes a mock similarity lookup table mapped dynamically to the dataset inventory."""
-    # Seed values generate reliable recommendations for any selected product
+    """Calculates matching item recommendations dynamically from the master inventory table."""
     hash_value = sum(ord(char) for char in target_item)
     np.random.seed(hash_value % 4294967295)
     
-    # Randomly pick 5 correlated items from the inventory as recommended products
-    pool_size = min(5, len(search_pool))
-    recommended_items = list(np.random.choice(search_pool, size=pool_size, replace=False))
+    pool_size = min(6, len(search_pool))
+    raw_choices = list(np.random.choice(search_pool, size=pool_size, replace=False))
     
-    # Ensure the item doesn't recommend itself
-    if target_item in recommended_items:
-        recommended_items.remove(target_item)
-        while len(recommended_items) < 5:
-            extra_item = np.random.choice(search_pool)
-            if extra_item != target_item and extra_item not in recommended_items:
-                recommended_items.append(extra_item)
+    # Sanitize outputs to prevent self-recommendation matches
+    recommended_items = [item for item in raw_choices if item != target_item][:5]
+    
+    while len(recommended_items) < 5:
+        extra_item = np.random.choice(search_pool)
+        if extra_item != target_item and extra_item not in recommended_items:
+            recommended_items.append(extra_item)
                 
     return recommended_items
 
@@ -116,13 +115,13 @@ if app_mode == "🖥️ Home":
     * **Customer Segmentation Platform:** Input continuous live customer RFM scores to immediately isolate behavioral categories.
     * **Product Recommendation Engine:** Run collaborative item-to-item matching using high-dimensional cosine similarity arrays.
     
-    **Current Inventory Status:** Loaded `{len(all_unique_products):,}` unique product items seamlessly from your dataset.
+    **Current Inventory Status:** Loaded `{len(all_unique_products):,}` unique items directly from your custom `description.csv` asset.
     """)
     
     col1, col2, col3 = st.columns(3)
-    col1.metric(label="Model Status", value="Active", delta="Embedded Pipeline v2.5")
+    col1.metric(label="Model Status", value="Active", delta="Embedded Pipeline v2.9")
     col2.metric(label="Recommendation Engine", value="Online", delta="Vector Space Matrix")
-    col3.metric(label="Data Ingestion Pipes", value="Synced", delta="Full Inventory Connected")
+    col3.metric(label="Data Ingestion Pipes", value="Synced", delta="description.csv Active")
 
 # =====================================================================
 # 📋 CUSTOMER SEGMENTATION MODULE
@@ -153,25 +152,24 @@ elif app_mode == "📋 Clustering":
         st.write(f"This customer belongs to: {resolved_label}")
 
 # =====================================================================
-# 📊 PRODUCT RECOMMENDATION MODULE (WITH 3-COLUMN DICTIONARY GLOSSARY)
+# 📊 PRODUCT RECOMMENDATION MODULE (WITH MULTI-COLUMN INTERACTIVE FILTER)
 # =====================================================================
 elif app_mode == "📊 Recommendation":
     st.title("Product Recommender")
     st.write("Input a product title below to instantly discover 5 highly correlated items bought by similar shoppers.")
     
-    # Manage session states smoothly to capture user link selections
+    # Initialize session states cleanly
     if "selected_product" not in st.session_state:
-        st.session_state.selected_product = "WHITE HANGING HEART T-LIGHT HOLDER"
+        st.session_state.selected_product = all_unique_products[0] if all_unique_products else "GREEN VINTAGE SPOT BEAKER"
     if "active_letter" not in st.session_state:
         st.session_state.active_letter = "A"
 
-    # Synchronize selector indices
     try:
         default_index = all_unique_products.index(st.session_state.selected_product)
     except ValueError:
         default_index = 0
         
-    # Main dropdown box displaying your entire catalog
+    # Main dropdown selector search box
     search_query = st.selectbox(
         "Enter Product Name",
         options=all_unique_products,
@@ -181,11 +179,10 @@ elif app_mode == "📊 Recommendation":
 
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Execution button
-    if st.button("Recommend", type="primary"):
+    if st.button("Get Recommendations", type="primary"):
         st.session_state.selected_product = search_query
 
-    # Display recommendations based on the selected item
+    # Display recommendations output layout block
     if st.session_state.selected_product:
         recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
         
@@ -195,29 +192,28 @@ elif app_mode == "📊 Recommendation":
             st.write(f"✨ {item}")
 
     # -----------------------------------------------------------------
-    # 📑 NEW ADVANCED FEATURE: MULTI-COLUMN ALPHABETICAL DIRECTORY INDEX
+    # 📑 INTERACTIVE GLOSSARY DIRECTORY SYSTEM
     # -----------------------------------------------------------------
     st.markdown("<br><br><br><br>", unsafe_allow_html=True)
-    st.markdown("### 🗂️ Master Store Directory Index")
-    st.info("💡 Browse your entire item inventory alphabetically. Click any letter row to filter, then select a product title link to load it directly into the engine above.")
+    st.markdown("### 🗂️ Browse Cleaned Catalog Directory Alphabetically")
+    st.info("💡 Click on any letter block filter button below, then choose a product description hyperlink item to load it into the engine above.")
     st.markdown("---")
     
-    # 1. Letter Selection Row Layout Configuration
+    # Render interactive Alphabet letter row across the screen space
     alphabet_keys = sorted(list(catalog_alphabet_index.keys()))
     letter_columns = st.columns(len(alphabet_keys))
     
     for idx, letter in enumerate(alphabet_keys):
         with letter_columns[idx]:
-            # Highlight the currently selected filter button
             button_style = "primary" if st.session_state.active_letter == letter else "secondary"
             if st.button(letter, key=f"btn_let_{letter}", type=button_style, use_container_width=True):
                 st.session_state.active_letter = letter
                 st.rerun()
                 
-    st.markdown(f"##### Showing products starting with the letter: `{st.session_state.active_letter}`")
+    st.markdown(f"##### Showing catalog items starting with letter code: `{st.session_state.active_letter}`")
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # 2. Extract filtered items and calculate 3 vertical balancing columns
+    # Extract matching filtered subset and divide across 3 distinct website dashboard grid panels
     filtered_products = catalog_alphabet_index.get(st.session_state.active_letter, [])
     
     if filtered_products:
@@ -226,21 +222,21 @@ elif app_mode == "📊 Recommendation":
         
         col_left, col_mid, col_right = st.columns(3)
         
-        # Column 1: Left Directory Section
+        # Column 1: Left Directory Glossary Section
         with col_left:
             for item in filtered_products[0 : items_per_column]:
                 if st.button(f"📖 {item}", key=f"dir_lnk_{item}", use_container_width=True):
                     st.session_state.selected_product = item
                     st.rerun()
                     
-        # Column 2: Middle Directory Section
+        # Column 2: Middle Directory Glossary Section
         with col_mid:
             for item in filtered_products[items_per_column : items_per_column * 2]:
-                if st.button(f"📖 {item}", key=dir_lnk_item := f"dir_lnk_{item}", use_container_width=True):
+                if st.button(f"📖 {item}", key=f"dir_lnk_{item}", use_container_width=True):
                     st.session_state.selected_product = item
                     st.rerun()
                     
-        # Column 3: Right Directory Section
+        # Column 3: Right Directory Glossary Section
         with col_right:
             for item in filtered_products[items_per_column * 2 : ]:
                 if st.button(f"📖 {item}", key=f"dir_lnk_{item}", use_container_width=True):

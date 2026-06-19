@@ -83,8 +83,8 @@ def predict_and_calibrate_segment(recency, frequency, monetary):
 @st.cache_resource
 def load_cleaned_description_catalog():
     csv_filename = "description.csv"
-    fallback_items = ["BLUE VINTAGE SPOT BEAKER", "GREEN VINTAGE SPOT BEAKER", "WHITE HANGING HEART T-LIGHT HOLDER"]
-    fallback_index = {"B": ["BLUE VINTAGE SPOT BEAKER"], "G": ["GREEN VINTAGE SPOT BEAKER"], "W": ["WHITE HANGING HEART T-LIGHT HOLDER"]}
+    fallback_items = ["BLUE VINTAGE SPOT BEAKER", "GREEN VINTAGE SPOT BEAKER", "WHITE HANGING HEART T-LIGHT HOLDER", "10 COLOUR SPACEBOY PEN"]
+    fallback_index = {"B": ["BLUE VINTAGE SPOT BEAKER"], "G": ["GREEN VINTAGE SPOT BEAKER"], "W": ["WHITE HANGING HEART T-LIGHT HOLDER"], "1": ["10 COLOUR SPACEBOY PEN"]}
 
     if not os.path.exists(csv_filename):
         return fallback_items, fallback_index
@@ -92,14 +92,17 @@ def load_cleaned_description_catalog():
     try:
         df = pd.read_csv(csv_filename)
         unique_catalog = sorted(df["Description"].dropna().astype(str).str.strip().str.upper().tolist())
+        if "10 COLOUR SPACEBOY PEN" not in unique_catalog:
+            unique_catalog.append("10 COLOUR SPACEBOY PEN")
+        unique_catalog = sorted(unique_catalog)
+        
         alphabet_groups = {}
         for item in unique_catalog:
             if item:
                 first_letter = item[0]
-                if first_letter.isalpha():
-                    if first_letter not in alphabet_groups:
-                        alphabet_groups[first_letter] = []
-                    alphabet_groups[first_letter].append(item)
+                if first_letter not in alphabet_groups:
+                    alphabet_groups[first_letter] = []
+                alphabet_groups[first_letter].append(item)
         return unique_catalog, alphabet_groups
     except Exception as e:
         st.error(f"Error parsing unique description CSV file: {e}")
@@ -124,7 +127,7 @@ def compute_live_recommendation_vector(target_item, search_pool):
     return recommended_items
 
 # =====================================================================
-# 🎨 REACTBITS-STYLE COMPONENT LIBRARY (UPGRADED CSS ENGINE)
+# 🎨 REACTBITS-STYLE COMPONENT LIBRARY (UPGRADED STRUCTURAL CSS ENGINE)
 # =====================================================================
 def inject_global_styles():
     st.markdown("""
@@ -168,28 +171,21 @@ def inject_global_styles():
     .hb-noise{ position:fixed; inset:0; z-index:999; pointer-events:none; opacity:.035; mix-blend-mode:overlay; background-image:radial-gradient(rgba(255,255,255,.6) 1px, transparent 1px); background-size:3px 3px; }
     @keyframes hbTwinkle{0%,100%{opacity:.1}50%{opacity:.5}}
     
-    /* ANIMATIONS AND FONTS */
+    /* TEXT ANIMATIONS */
     .hb-split span{ display:inline-block; opacity:0; transform:translateY(.6em); animation:hbRise .6s var(--ease) forwards; }
     @keyframes hbRise{ to{opacity:1; transform:translateY(0);} }
     .hb-blur{ display:inline-block; filter:blur(8px); opacity:0; transform:translateY(6px); animation:hbBlurIn .7s var(--ease) forwards; }
     @keyframes hbBlurIn{ to{filter:blur(0); opacity:1; transform:translateY(0);} }
     .hb-gradient-text{ background:linear-gradient(100deg,var(--violet),var(--hero-green) 45%,var(--amber) 85%); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation:hbGradientPan 6s linear infinite; font-weight:700; }
     @keyframes hbGradientPan{ to{ background-position:200% center; } }
-    .hb-shiny{ background:linear-gradient(100deg,var(--text-dim) 35%,var(--text) 50%,var(--text-dim) 65%); background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation:hbShinySweep 3.2s linear infinite; }
+    .hb-shiny{ background:linear-gradient(100deg,var(--text-dim) 35%,var(--text) 50%,var(--text-dim) 65%); background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation:hbShinySweep 3.2s linear infinite; font-weight:700; }
     @keyframes hbShinySweep{ 0%{background-position:120% center;} 100%{background-position:-20% center;} }
     
-    /* STANDARD SPOTLIGHT CARD */
+    /* STANDARD BOXES */
     .hb-spotlight{ position:relative; border-radius:14px; border:1px solid var(--line); background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); padding:20px 22px; overflow:hidden; transition:transform .3s var(--ease), border-color .3s var(--ease); }
     .hb-spotlight:hover{ transform:translateY(-3px); border-color:rgba(139,124,246,.35); }
-    .hb-spotlight::before{ content:""; position:absolute; inset:0; opacity:0; transition:opacity .3s var(--ease); background:radial-gradient(220px circle at 50% 0%, rgba(139,124,246,.18), transparent 70%); }
-    .hb-spotlight:hover::before{ opacity:1; }
     
-    /* ⚡ REACTBITS-INSPIRED INTERACTIVE MOVING GRADIENT BORDER CARD */
-    @property --border-angle {
-        syntax: '<angle>';
-        initial-value: 0deg;
-        inherits: false;
-    }
+    /* ⚡ RE-ENGINEERED COMPATIBLE DYNAMIC GRADIENT BORDER FRAMEWORK */
     .hb-animated-border-card {
         position: relative;
         border-radius: 14px;
@@ -197,9 +193,10 @@ def inject_global_styles():
         background: var(--bg-elev);
         overflow: hidden;
         z-index: 1;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        animation: hbIntroCard 0.5s var(--ease) forwards;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.5);
     }
+    
+    /* The rotating track background border layer */
     .hb-animated-border-card::before {
         content: "";
         position: absolute;
@@ -208,9 +205,18 @@ def inject_global_styles():
         top: -50%;
         width: 200%;
         height: 200%;
-        background-image: conic-gradient(from var(--border-angle), var(--bc, var(--violet)), transparent 45%, var(--bc, var(--violet)));
-        animation: hbRotateBorder 3s linear infinite;
+        background: conic-gradient(
+            from 0deg,
+            var(--bc, var(--violet)) 0%,
+            rgba(255,255,255,0.1) 25%,
+            var(--bc, var(--violet)) 50%,
+            rgba(255,255,255,0.1) 75%,
+            var(--bc, var(--violet)) 100%
+        );
+        animation: hbSpinBorder 4s linear infinite;
     }
+    
+    /* The masking body layer that leaves the beautiful border exposed */
     .hb-animated-border-card::after {
         content: "";
         position: absolute;
@@ -222,37 +228,51 @@ def inject_global_styles():
         background: var(--bg-elev);
         border-radius: 12px;
     }
-    @keyframes hbRotateBorder {
-        100% { --border-angle: 360deg; }
-    }
-    @keyframes hbIntroCard {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
+    
+    @keyframes hbSpinBorder {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
-    /* ⚡ ACTIVE SHIMMER LOADING TRACK BAR */
-    .hb-progress-track{ width:100%; height:10px; border-radius:6px; background:var(--bg-elev-2); overflow:hidden; position:relative; margin-top:8px; }
-    .hb-progress-fill{ 
-        height:100%; 
-        border-radius:6px; 
-        transform-origin:left;
-        animation: hbFillScale 1.2s cubic-bezier(.19,1,.22,1) forwards;
+    /* ⚡ UPGRADED RELIABLE GLOW TRACK PROGRESS ENGINE */
+    .hb-progress-container {
+        margin: 14px 0;
         position: relative;
     }
+    .hb-progress-track {
+        width: 100%;
+        height: 12px;
+        border-radius: 8px;
+        background: #1a1829;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+    .hb-progress-fill { 
+        height: 100%; 
+        border-radius: 8px; 
+        position: relative;
+        background: linear-gradient(90deg, var(--bc, var(--violet)), var(--hero-green));
+        box-shadow: 0 0 12px var(--bc, var(--violet));
+        transition: width 0.8s ease-out;
+    }
+    /* Infinite Shimmer Sweep on the bar fill */
     .hb-progress-fill::after {
         content: "";
         position: absolute;
-        inset: 0;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        transform: translateX(-100%);
-        animation: hbShimmerBar 1.8s infinite linear;
+        top: 0; left: 0; bottom: 0; right: 0;
+        background: linear-gradient(
+            90deg, 
+            rgba(255,255,255,0) 0%, 
+            rgba(255,255,255,0.3) 50%, 
+            rgba(255,255,255,0) 100%
+        );
+        animation: hbBarShimmer 2s infinite linear;
+        background-size: 200% 100%;
     }
-    @keyframes hbFillScale {
-        from { transform: scaleX(0); }
-        to { transform: scaleX(1); }
-    }
-    @keyframes hbShimmerBar {
-        100% { transform: translateX(100%); }
+    @keyframes hbBarShimmer {
+        0% { background-position: 100% 0; }
+        100% { background-position: -100% 0; }
     }
     
     /* ORBS ELEMENT CONSTELLATION */
@@ -314,7 +334,7 @@ def eyebrow(text):
 def spotlight_card_html(inner_html):
     st.markdown(f'<div class="hb-spotlight">{inner_html}</div>', unsafe_allow_html=True)
 
-# ⚡ UPGRADED MIGRATED WRAPPER ENGINE: INJECTS CONIC BEAM ANIMATED BOUNDARIES
+# ⚡ ERROR-FREE REACTBITS CARD WRAPPER
 def animated_border_card_html(inner_html, color_hex="#8b7cf6"):
     st.markdown(f"""
     <div class="hb-animated-border-card" style="--bc: {color_hex};">
@@ -339,11 +359,14 @@ def orb(color, label, active=False, size=70, loop_idx=None):
 def status_pill(text):
     st.markdown(f'<div class="hb-eyebrow"><span class="hb-status-dot"></span>{text}</div>', unsafe_allow_html=True)
 
-def progress_glow(pct, color_from="var(--violet)", color_to="var(--hero-green)"):
+# ⚡ ERROR-FREE COMPATIBLE PROGRESS GLOW FILL BAR ENGINE
+def progress_glow(pct, color_hex="#8b7cf6"):
     pct = max(0, min(100, pct))
     st.markdown(f"""
-    <div class="hb-progress-track">
-        <div class="hb-progress-fill" style="width:{pct}%; background:linear-gradient(90deg,{color_from},{color_to});"></div>
+    <div class="hb-progress-container" style="--bc: {color_hex};">
+        <div class="hb-progress-track">
+            <div class="hb-progress-fill" style="width: {pct}%;"></div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -483,17 +506,17 @@ elif app_mode == "Clustering":
         st.markdown("<br>", unsafe_allow_html=True)
         result_col, orb_col = st.columns([2, 1])
         with result_col:
-            # ⚡ REACTBITS LIVE RE-RENDER: Animated Rotating Border synchronized with Segment Category Color
+            # ⚡ REACTBITS DYNAMIC BORDER PANEL: Predicted Strategic Cohort
             animated_border_card_html(f"""
             <div class="hb-eyebrow">PREDICTED STRATEGIC COHORT</div>
-            <h2 style="margin:8px 0 14px;">{shiny_text(resolved_label)}</h2>
+            <h2 style="margin:8px 0 14px;"><span class="hb-shiny">{resolved_label}</span></h2>
             """, color_hex=seg_color)
             
             decrypt_text_widget(resolved_label, height=38, font_size=20, color=seg_color)
             st.markdown(f'<div style="margin-top:10px; color:var(--text-dim); font-size:13px;">Relative confidence vs. nearest competing cluster</div>', unsafe_allow_html=True)
             
-            # ⚡ REACTBITS LIVE RE-RENDER: Shimmering Track Indicator Bar
-            progress_glow(confidence_pct, color_from=seg_color, color_to="var(--hero-green)")
+            # ⚡ REACTBITS PROGRESS FILL: Continuous Shimmering Loading Fill Track
+            progress_glow(confidence_pct, color_hex=seg_color)
             st.markdown(f'<div style="text-align:right; font-family:JetBrains Mono,monospace; font-size:12px; color:var(--text-dim); margin-top:4px;">{confidence_pct}%</div>', unsafe_allow_html=True)
         with orb_col:
             orb(seg_color, resolved_label, active=True, size=90)
@@ -520,9 +543,9 @@ elif app_mode == "Recommendation":
     blur_text("Input a product title below to instantly discover 5 highly correlated items bought by similar shoppers, or select from the alphabetical catalog directory below.")
     
     if "selected_product" not in st.session_state:
-        st.session_state.selected_product = all_unique_products[0] if all_unique_products else "GREEN VINTAGE SPOT BEAKER"
+        st.session_state.selected_product = "10 COLOUR SPACEBOY PEN"
     if "active_letter" not in st.session_state:
-        st.session_state.active_letter = "A"
+        st.session_state.active_letter = "1" if all_unique_products and all_unique_products[0][0].isdigit() else "A"
 
     try:
         default_index = all_unique_products.index(st.session_state.selected_product)
@@ -545,7 +568,7 @@ elif app_mode == "Recommendation":
     if st.session_state.selected_product:
         recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
         
-        # ⚡ REACTBITS LIVE RE-RENDER: Animated Rotating Border applied to Recommendations Display Panel
+        # ⚡ REACTBITS DYNAMIC BORDER PANEL: Product Recommendations Panel Header Box
         animated_border_card_html(f"""
         <div class="hb-eyebrow">RECOMMENDED CO-PURCHASED PRODUCTS FOR:</div>
         <h3 style="margin:6px 0 12px; color:var(--text); font-family:'Space Grotesk',sans-serif;">{st.session_state.selected_product}</h3>

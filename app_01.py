@@ -106,7 +106,7 @@ with st.sidebar:
 # =====================================================================
 # 🏠 HOME PAGE MODULE
 # =====================================================================
-if app_mode == "🖥️ Home":
+if app_mode == "🏠 Home":
     st.title("🚀 Enterprise Customer Analytics Dashboard")
     st.markdown(f"""
     Welcome to your real-time customer data management console. This interface utilizes your 
@@ -199,7 +199,7 @@ elif app_mode == "📊 Recommendation":
     # 📑 INTERACTIVE GLOSSARY DIRECTORY SYSTEM
     # -----------------------------------------------------------------
     st.markdown("<br><br><br><br>", unsafe_allow_html=True)
-    st.markdown("### 🗂️ Browse Cleaned Catalog Directory Alphabetically")
+    st.markdown("### 📓 Browse Cleaned Catalog Directory Alphabetically")
     st.info("💡 Click on any letter block filter button below, then choose a product description hyperlink item to load it into the engine above.")
     st.markdown("---")
     

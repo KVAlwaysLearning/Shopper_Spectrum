@@ -263,16 +263,15 @@ def inject_global_styles():
         -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
         -webkit-mask-composite:xor; mask-composite:exclude; }
 
-    /* ---------- ORB (glowing pulsing segment marker) ---------- */
+    /* ---------- ORB (glowing segment marker without blinking) ---------- */
     .hb-orb-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
-    .hb-orb{ border-radius:50%; opacity:.5; animation:hbFloat 5s ease-in-out infinite;
-        box-shadow:0 0 24px var(--oc), inset 0 0 16px rgba(255,255,255,.15);
-        background:radial-gradient(circle at 35% 30%, var(--oc), transparent 70%), var(--oc); }
-    .hb-orb.active{ opacity:1; transform:scale(1.12); animation:hbPulse 1.8s ease-in-out infinite;
-        box-shadow:0 0 50px var(--oc), inset 0 0 22px rgba(255,255,255,.25); }
-    @keyframes hbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-    @keyframes hbPulse{0%,100%{box-shadow:0 0 36px var(--oc), inset 0 0 18px rgba(255,255,255,.2)}50%{box-shadow:0 0 58px var(--oc), inset 0 0 26px rgba(255,255,255,.3)}}
-    .hb-orb-label{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-muted); text-align:center; }
+    .hb-orb{ border-radius:50%; opacity:.45;
+        box-shadow:0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15);
+        background:radial-gradient(circle at 35% 30%, var(--oc), transparent 70%), var(--oc);
+        transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease; }
+    .hb-orb.active{ opacity:1; transform:scale(1.12);
+        box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
+    .hb-orb-label{ font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--text-muted); text-align:center; }
 
     /* ---------- STATUS DOT ---------- */
     .hb-status-dot{ width:7px; height:7px; border-radius:50%; background:var(--hero-green);

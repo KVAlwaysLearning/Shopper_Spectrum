@@ -271,6 +271,10 @@ def inject_global_styles():
         transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease; }
     .hb-orb.active{ opacity:1; transform:scale(1.12);
         box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
+    @keyframes hbLoopHighlight {
+        0%, 20% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
+        25%, 100% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+    }
     .hb-orb-label{ font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--text-muted); text-align:center; }
 
     /* ---------- STATUS DOT ---------- */
@@ -378,11 +382,16 @@ def border_card_html(inner_html):
     st.markdown(f'<div class="hb-border-card">{inner_html}</div>', unsafe_allow_html=True)
 
 
-def orb(color, label, active=False, size=70):
-    cls = "hb-orb active" if active else "hb-orb"
+def orb(color, label, active=False, size=70, loop_delay=None):
+    if loop_delay is not None:
+        style = f"style=\"--oc:{color}; width:{size}px; height:{size}px; animation: hbLoopHighlight 8s infinite; animation-delay: {loop_delay}s;\""
+        cls = "hb-orb"
+    else:
+        cls = "hb-orb active" if active else "hb-orb"
+        style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
     st.markdown(f"""
     <div class="hb-orb-wrap">
-        <div class="{cls}" style="--oc:{color}; width:{size}px; height:{size}px;"></div>
+        <div class="{cls}" {style}></div>
         <div class="hb-orb-label">{label}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -526,7 +535,7 @@ if app_mode == "🏠​ Home":
     orb_cols = st.columns(4)
     for i, col in enumerate(orb_cols):
         with col:
-            orb(SEGMENT_COLOR_MAP[i], BUSINESS_SEGMENT_MAP[i], active=(i == 0))
+            orb(SEGMENT_COLOR_MAP[i], BUSINESS_SEGMENT_MAP[i], size=70, loop_delay=-i * 2)
 
     st.markdown("<br>", unsafe_allow_html=True)
     eyebrow("SYSTEM STATUS")

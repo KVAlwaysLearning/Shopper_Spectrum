@@ -426,7 +426,7 @@ with st.sidebar:
 # 🏠 HOME PAGE MODULE
 # =====================================================================
 if app_mode == "🏠​ Home":
-    split_text("Customer Analytics, Illuminated.", tag="h1")
+    split_text("SHOPPER'S SPECTRUM", tag="h1")
     typewriter_widget([
         "Segment customers by RFM behavior.",
         "Surface look-alike product recommendations.",
@@ -434,8 +434,8 @@ if app_mode == "🏠​ Home":
     ], height=40, font_size=18)
 
     blur_text(
-        "HALO reads your live customer signals and routes them through the same embedded "
-        "clustering and recommendation pipelines as before — only the surface has changed.",
+        "Interactive Dashboard Covering All Products!!"
+        "Machine Learning Model based Customer Segmentation",
         tag="p", extra_class=""
     )
 

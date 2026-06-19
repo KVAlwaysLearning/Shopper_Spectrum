@@ -271,28 +271,28 @@ def inject_global_styles():
         transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease; }
     .hb-orb.active{ opacity:1; transform:scale(1.12);
         box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
-    .hb-orb-seq-0{ animation: hbHighlightSeq0 8s infinite ease-in-out; }
-    .hb-orb-seq-1{ animation: hbHighlightSeq1 8s infinite ease-in-out; }
-    .hb-orb-seq-2{ animation: hbHighlightSeq2 8s infinite ease-in-out; }
-    .hb-orb-seq-3{ animation: hbHighlightSeq3 8s infinite ease-in-out; }
+    .hb-orb-seq-0{ animation: hbHighlightSeq0 8s infinite ease-in-out; transition: none !important; }
+    .hb-orb-seq-1{ animation: hbHighlightSeq1 8s infinite ease-in-out; transition: none !important; }
+    .hb-orb-seq-2{ animation: hbHighlightSeq2 8s infinite ease-in-out; transition: none !important; }
+    .hb-orb-seq-3{ animation: hbHighlightSeq3 8s infinite ease-in-out; transition: none !important; }
     @keyframes hbHighlightSeq0 {
-        0%, 20% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
-        25%, 100% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+        0%, 18% { opacity: 1; transform: scale(1.16); filter: brightness(1.35) saturate(1.2); }
+        23%, 100% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); }
     }
     @keyframes hbHighlightSeq1 {
-        0%, 20% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
-        25%, 45% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
-        50%, 100% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+        0%, 22% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); }
+        25%, 43% { opacity: 1; transform: scale(1.16); filter: brightness(1.35) saturate(1.2); }
+        48%, 100% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); }
     }
     @keyframes hbHighlightSeq2 {
-        0%, 45% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
-        50%, 70% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
-        75%, 100% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+        0%, 47% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); }
+        50%, 68% { opacity: 1; transform: scale(1.16); filter: brightness(1.35) saturate(1.2); }
+        73%, 100% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); }
     }
     @keyframes hbHighlightSeq3 {
-        0%, 70% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
-        75%, 95% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
-        100% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+        0%, 72% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); }
+        75%, 93% { opacity: 1; transform: scale(1.16); filter: brightness(1.35) saturate(1.2); }
+        98%, 100% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); }
     }
     .hb-orb-label{ font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--text-muted); text-align:center; }
 

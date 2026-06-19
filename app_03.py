@@ -178,14 +178,18 @@ def inject_global_styles():
     .hb-shiny{ background:linear-gradient(100deg,var(--text-dim) 35%,var(--text) 50%,var(--text-dim) 65%); background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation:hbShinySweep 3.2s linear infinite; }
     @keyframes hbShinySweep{ 0%{background-position:120% center;} 100%{background-position:-20% center;} }
     
-    /* CARDS */
-    .hb-glass{ background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); border:1px solid var(--line); border-radius:14px; padding:20px 22px; backdrop-filter:blur(14px); }
+    /* STANDARD SPOTLIGHT CARD */
     .hb-spotlight{ position:relative; border-radius:14px; border:1px solid var(--line); background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); padding:20px 22px; overflow:hidden; transition:transform .3s var(--ease), border-color .3s var(--ease); }
     .hb-spotlight:hover{ transform:translateY(-3px); border-color:rgba(139,124,246,.35); }
     .hb-spotlight::before{ content:""; position:absolute; inset:0; opacity:0; transition:opacity .3s var(--ease); background:radial-gradient(220px circle at 50% 0%, rgba(139,124,246,.18), transparent 70%); }
     .hb-spotlight:hover::before{ opacity:1; }
     
-    /* ⚡ REACTBITS INTERACTIVE ANIMATED BORDER ELEMENT */
+    /* ⚡ REACTBITS-INSPIRED INTERACTIVE MOVING GRADIENT BORDER CARD */
+    @property --border-angle {
+        syntax: '<angle>';
+        initial-value: 0deg;
+        inherits: false;
+    }
     .hb-animated-border-card {
         position: relative;
         border-radius: 14px;
@@ -193,8 +197,8 @@ def inject_global_styles():
         background: var(--bg-elev);
         overflow: hidden;
         z-index: 1;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        animation: hbIntroCard 0.6s var(--ease) forwards;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        animation: hbIntroCard 0.5s var(--ease) forwards;
     }
     .hb-animated-border-card::before {
         content: "";
@@ -204,12 +208,8 @@ def inject_global_styles():
         top: -50%;
         width: 200%;
         height: 200%;
-        background-color: transparent;
-        background-repeat: no-repeat;
-        background-size: 50% 50%, 50% 50%;
-        background-position: 0 0, 100% 0, 100% 100%, 0 100%;
-        background-image: conic-gradient(from var(--border-angle, 0deg), var(--bc, var(--violet)), transparent 60%, var(--bc, var(--violet)));
-        animation: hbRotateBorder 4s linear infinite;
+        background-image: conic-gradient(from var(--border-angle), var(--bc, var(--violet)), transparent 45%, var(--bc, var(--violet)));
+        animation: hbRotateBorder 3s linear infinite;
     }
     .hb-animated-border-card::after {
         content: "";
@@ -222,36 +222,30 @@ def inject_global_styles():
         background: var(--bg-elev);
         border-radius: 12px;
     }
-    
-    @property --border-angle {
-        syntax: '<angle>';
-        initial-value: 0deg;
-        inherits: false;
-    }
     @keyframes hbRotateBorder {
         100% { --border-angle: 360deg; }
     }
     @keyframes hbIntroCard {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ⚡ UPGRADED PROGRESS GLOW FILL BAR */
-    .hb-progress-track{ width:100%; height:10px; border-radius:6px; background:var(--bg-elev-2); overflow:hidden; position:relative; }
+    /* ⚡ ACTIVE SHIMMER LOADING TRACK BAR */
+    .hb-progress-track{ width:100%; height:10px; border-radius:6px; background:var(--bg-elev-2); overflow:hidden; position:relative; margin-top:8px; }
     .hb-progress-fill{ 
         height:100%; 
         border-radius:6px; 
         transform-origin:left;
-        animation: hbFillScale 1.4s cubic-bezier(.19,1,.22,1) forwards;
+        animation: hbFillScale 1.2s cubic-bezier(.19,1,.22,1) forwards;
         position: relative;
     }
     .hb-progress-fill::after {
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
         transform: translateX(-100%);
-        animation: hbShimmerBar 2s infinite linear;
+        animation: hbShimmerBar 1.8s infinite linear;
     }
     @keyframes hbFillScale {
         from { transform: scaleX(0); }
@@ -317,7 +311,10 @@ def shiny_text(text, tag="span", extra_class=""):
 def eyebrow(text):
     st.markdown(f'<div class="hb-eyebrow">{text}</div>', unsafe_allow_html=True)
 
-# ⚡ REACTBITS REBUILT ANIMATED CARD WRAPPER WITH CONFIGURABLE BORDER COLOR VARIABLE
+def spotlight_card_html(inner_html):
+    st.markdown(f'<div class="hb-spotlight">{inner_html}</div>', unsafe_allow_html=True)
+
+# ⚡ UPGRADED MIGRATED WRAPPER ENGINE: INJECTS CONIC BEAM ANIMATED BOUNDARIES
 def animated_border_card_html(inner_html, color_hex="#8b7cf6"):
     st.markdown(f"""
     <div class="hb-animated-border-card" style="--bc: {color_hex};">
@@ -486,7 +483,7 @@ elif app_mode == "Clustering":
         st.markdown("<br>", unsafe_allow_html=True)
         result_col, orb_col = st.columns([2, 1])
         with result_col:
-            # ⚡ UPGRADED: Core ReactBits Moving Border integration synced with segment context color
+            # ⚡ REACTBITS LIVE RE-RENDER: Animated Rotating Border synchronized with Segment Category Color
             animated_border_card_html(f"""
             <div class="hb-eyebrow">PREDICTED STRATEGIC COHORT</div>
             <h2 style="margin:8px 0 14px;">{shiny_text(resolved_label)}</h2>
@@ -495,7 +492,7 @@ elif app_mode == "Clustering":
             decrypt_text_widget(resolved_label, height=38, font_size=20, color=seg_color)
             st.markdown(f'<div style="margin-top:10px; color:var(--text-dim); font-size:13px;">Relative confidence vs. nearest competing cluster</div>', unsafe_allow_html=True)
             
-            # ⚡ UPGRADED: Enhanced confidence tracker bar with loading shimmers
+            # ⚡ REACTBITS LIVE RE-RENDER: Shimmering Track Indicator Bar
             progress_glow(confidence_pct, color_from=seg_color, color_to="var(--hero-green)")
             st.markdown(f'<div style="text-align:right; font-family:JetBrains Mono,monospace; font-size:12px; color:var(--text-dim); margin-top:4px;">{confidence_pct}%</div>', unsafe_allow_html=True)
         with orb_col:
@@ -548,7 +545,7 @@ elif app_mode == "Recommendation":
     if st.session_state.selected_product:
         recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
         
-        # ⚡ UPGRADED: Replaced static block with an animated sweeping gradient border
+        # ⚡ REACTBITS LIVE RE-RENDER: Animated Rotating Border applied to Recommendations Display Panel
         animated_border_card_html(f"""
         <div class="hb-eyebrow">RECOMMENDED CO-PURCHASED PRODUCTS FOR:</div>
         <h3 style="margin:6px 0 12px; color:var(--text); font-family:'Space Grotesk',sans-serif;">{st.session_state.selected_product}</h3>

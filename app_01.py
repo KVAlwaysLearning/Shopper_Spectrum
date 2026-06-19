@@ -96,7 +96,7 @@ with st.sidebar:
     st.markdown("### 🏪 Navigation Dashboard")
     app_mode = st.radio(
         "Go To Page:",
-        ["🖥️ Home", "📋 Clustering", "📊 Recommendation"],
+        ["🏠​ Home", "📋 Clustering", "📊 Recommendation"],
         label_visibility="collapsed"
     )
     st.markdown("---")

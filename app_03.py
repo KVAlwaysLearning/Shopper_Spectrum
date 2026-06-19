@@ -271,9 +271,28 @@ def inject_global_styles():
         transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease; }
     .hb-orb.active{ opacity:1; transform:scale(1.12);
         box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
-    @keyframes hbLoopHighlight {
+    .hb-orb-seq-0{ animation: hbHighlightSeq0 8s infinite ease-in-out; }
+    .hb-orb-seq-1{ animation: hbHighlightSeq1 8s infinite ease-in-out; }
+    .hb-orb-seq-2{ animation: hbHighlightSeq2 8s infinite ease-in-out; }
+    .hb-orb-seq-3{ animation: hbHighlightSeq3 8s infinite ease-in-out; }
+    @keyframes hbHighlightSeq0 {
         0%, 20% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
         25%, 100% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+    }
+    @keyframes hbHighlightSeq1 {
+        0%, 20% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+        25%, 45% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
+        50%, 100% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+    }
+    @keyframes hbHighlightSeq2 {
+        0%, 45% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+        50%, 70% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
+        75%, 100% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+    }
+    @keyframes hbHighlightSeq3 {
+        0%, 70% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
+        75%, 95% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
+        100% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); }
     }
     .hb-orb-label{ font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--text-muted); text-align:center; }
 
@@ -382,10 +401,10 @@ def border_card_html(inner_html):
     st.markdown(f'<div class="hb-border-card">{inner_html}</div>', unsafe_allow_html=True)
 
 
-def orb(color, label, active=False, size=70, loop_delay=None):
-    if loop_delay is not None:
-        style = f"style=\"--oc:{color}; width:{size}px; height:{size}px; animation: hbLoopHighlight 8s infinite; animation-delay: {loop_delay}s;\""
-        cls = "hb-orb"
+def orb(color, label, active=False, size=70, loop_idx=None):
+    if loop_idx is not None:
+        cls = f"hb-orb hb-orb-seq-{loop_idx}"
+        style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
     else:
         cls = "hb-orb active" if active else "hb-orb"
         style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
@@ -535,7 +554,7 @@ if app_mode == "🏠​ Home":
     orb_cols = st.columns(4)
     for i, col in enumerate(orb_cols):
         with col:
-            orb(SEGMENT_COLOR_MAP[i], BUSINESS_SEGMENT_MAP[i], size=70, loop_delay=-i * 2)
+            orb(SEGMENT_COLOR_MAP[i], BUSINESS_SEGMENT_MAP[i], size=70, loop_idx=i)
 
     st.markdown("<br>", unsafe_allow_html=True)
     eyebrow("SYSTEM STATUS")
@@ -555,31 +574,6 @@ if app_mode == "🏠​ Home":
 elif app_mode == "📋 Clustering":
     split_text("Customer Segmentation", tag="h1")
     blur_text("Determine a customer's strategic group instantly by updating their active behavior variables below:")
-
-    # EXPANDER DETAILING IDENTIFIED MIN-MAX RANGES (Fulfills exact request to identify Ranges)
-    with st.expander("🔍 VIEW IDENTIFIED CUSTOMER SEGMENTATION BOUNDARIES (METRIC MAP)"):
-        st.markdown("""
-        To establish clear, action-oriented classification boundaries, we have mapped out the empirical 
-        bounds for all three behavioral axes (**Recency, Frequency, Monetary**) based on customer behaviors:
-        """)
-        
-        col_limits = st.columns(4)
-        for idx, (seg_name, limits) in enumerate(METRIC_LIMITS.items()):
-            with col_limits[idx]:
-                st.markdown(f"""
-                <div style="border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: rgba(255,255,255,0.02)">
-                    <h5 style="color:{SEGMENT_COLOR_MAP[idx]}; margin: 0 0 6px 0; font-family:'Space Grotesk',sans-serif;">{seg_name}</h5>
-                    <p style="font-size:12px; margin: 2px 0 2px 0; color: var(--text-muted); font-family:'JetBrains Mono',monospace;">
-                        <b>R (days):</b> {limits['recency']['min']} - {limits['recency']['max']}
-                    </p>
-                    <p style="font-size:12px; margin: 2px 0 2px 0; color: var(--text-muted); font-family:'JetBrains Mono',monospace;">
-                        <b>F (orders):</b> {limits['frequency']['min']} - {limits['frequency']['max'] if limits['frequency']['max'] < 10000 else '10k+'}
-                    </p>
-                    <p style="font-size:12px; margin: 2px 0 2px 0; color: var(--text-muted); font-family:'JetBrains Mono',monospace;">
-                        <b>M (spend):</b> £{limits['monetary']['min']:.0f} - {('£' + str(limits['monetary']['max']/1000000) + 'M') if limits['monetary']['max'] >= 5000000 else '£' + str(limits['monetary']['max'])}
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
@@ -610,18 +604,12 @@ elif app_mode == "📋 Clustering":
         with result_col:
             border_card_html(f"""
                 <div class="hb-eyebrow">PREDICTED STRATEGIC COHORT</div>
-                <h2 style="margin:8px 0 2px;">{shiny_text(resolved_label)}</h2>
-                <div style="font-size:13px; margin-top:2px; color:var(--text-muted);">
-                    Raw Model prediction: <code style="color:#f2a93b;">{res["model_label"]} (Cluster {res["model_id"]})</code>
-                </div>
-                <div style="font-size:13px; margin-top:2px; color:var(--text-muted); margin-bottom:14px;">
-                    Hybrid Calibration status: <code style="color:#3ddc97;">{'Auto-corrected' if res["model_label"] != resolved_label else 'Model Aligned'}</code>
-                </div>
+                <h2 style="margin:8px 0 14px;">{shiny_text(resolved_label)}</h2>
             """)
             decrypt_text_widget(resolved_label, height=38, font_size=20, color=seg_color)
             st.markdown(f'<div style="margin-top:10px; color:var(--text-dim); font-size:13px;">Relative confidence vs. nearest competing cluster</div>', unsafe_allow_html=True)
             progress_glow(confidence_pct, color_from=seg_color, color_to="var(--hero-green)")
-            st.markdown(f'<div style="text-align:right; font-family:JetBrains Mono,monospace; font-size:12px; color:var(--text-dim); margin-top:4px;">{confidence_pct}%</div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="text-align:right; font-family:JetBrains Mono,monospace; font-size:12px; color:var(--text-dim); margin-top:4px;\">{confidence_pct}%</div>', unsafe_allow_html=True)
 
         with orb_col:
             orb(seg_color, resolved_label, active=True, size=90)

@@ -157,7 +157,7 @@ def inject_global_styles():
     h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif !important; color:var(--text); }
     code, .mono { font-family:'JetBrains Mono',monospace; }
 
-    /* RFM Inputs Configuration: Text color changed from White to Black */
+    /* RFM Inputs Configuration: Forced Black Font inside Input Boxes */
     .stNumberInput input {
         color: #000000 !important;
         font-weight: 600 !important;
@@ -175,7 +175,6 @@ def inject_global_styles():
         box-shadow: 0 0 12px rgba(139,124,246, 0.25) !important;
     }
     
-    /* Smooth Active selection tracking list popover */
     ul[role="listbox"] {
         background-color: var(--bg-elev-2) !important;
         border: 1px solid var(--line) !important;
@@ -202,16 +201,49 @@ def inject_global_styles():
         transform-style: preserve-3d;
         transition: transform 0.5s var(--ease), border-color 0.5s var(--ease), border-radius 0.5s var(--ease), box-shadow 0.5s var(--ease);
     }
-
-    /* Interactive Hover Rules for Shape Alteration and Tilting */
     .hb-tilt-hover-card:hover {
         transform: rotateX(7deg) rotateY(-5deg) translateY(-4px) scale(1.02);
-        border-radius: 24px 8px 32px 14px; /* Organic shape distortion */
+        border-radius: 24px 8px 32px 14px;
         border-color: var(--brc) !important;
         box-shadow: -8px 12px 28px rgba(0,0,0,0.45), 0 0 22px rgba(139,124,246,0.15);
     }
 
-    /* ---------- AURORA BACKGROUNDS ---------- */
+    /* ---------- COLOR ANIMATIONS FOR HEADERS & LABELS ---------- */
+    .hb-split-color span { 
+        display: inline-block; 
+        opacity: 0; 
+        transform: translateY(.6em); 
+        animation: hbRiseShift 0.7s var(--ease) forwards, hbColorWave 8s ease-in-out infinite alternate;
+    }
+    @keyframes hbRiseShift { to { opacity: 1; transform: translateY(0); } }
+    @keyframes hbColorWave {
+        0% { color: var(--text); }
+        33% { color: var(--violet); }
+        66% { color: var(--hero-green); }
+        100% { color: var(--amber); }
+    }
+
+    /* Relative Confidence text shift color animation */
+    .hb-animated-confidence-text {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        margin-top: 15px;
+        animation: hbTextHueShift 5s ease-in-out infinite alternate;
+    }
+    @keyframes hbTextHueShift {
+        0% { color: var(--text-muted); text-shadow: 0 0 0px transparent; }
+        50% { color: var(--violet); text-shadow: 0 0 8px rgba(139,124,246,0.2); }
+        100% { color: var(--hero-green); text-shadow: 0 0 8px rgba(61,220,151,0.2); }
+    }
+
+    /* ---------- METRIC PROGRESS FILL GLOWS ---------- */
+    .hb-progress-track{ width:100%; height:8px; border-radius:6px; background:var(--bg-elev-2); overflow:hidden; margin-top:8px;}
+    .hb-progress-fill{ height:100%; border-radius:6px; background:linear-gradient(90deg,var(--violet),var(--hero-green)); animation:hbFillIn 1.1s var(--ease) forwards, hbGlowPan 3s linear infinite; background-size: 200% auto; transform-origin:left; }
+    @keyframes hbFillIn{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+    @keyframes hbGlowPan { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
+    /* ---------- AURORA BACKGROUND SYSTEMS ---------- */
     .hb-aurora{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
     .hb-aurora span{ position:absolute; width:55vw; height:55vw; border-radius:50%; filter:blur(90px); opacity:.30; }
     .hb-aurora .a1{ background:radial-gradient(circle,var(--violet),transparent 70%); top:-18%; left:-8%; animation:hbDrift1 26s ease-in-out infinite; }
@@ -226,9 +258,6 @@ def inject_global_styles():
     .hb-noise{ position:fixed; inset:0; z-index:999; pointer-events:none; opacity:.035; mix-blend-mode:overlay; background-image:radial-gradient(rgba(255,255,255,.6) 1px, transparent 1px); background-size:3px 3px; }
     @keyframes hbTwinkle{0%,100%{opacity:.1}50%{opacity:.5}}
 
-    /* ---------- TEXT DESIGN EFFECT CONFIGS ---------- */
-    .hb-split span{ display:inline-block; opacity:0; transform:translateY(.6em); animation:hbRise .6s var(--ease) forwards; }
-    @keyframes hbRise{ to{opacity:1; transform:translateY(0);} }
     .hb-blur{ display:inline-block; filter:blur(8px); opacity:0; transform:translateY(6px); animation:hbBlurIn .7s var(--ease) forwards; }
     @keyframes hbBlurIn{ to{filter:blur(0); opacity:1; transform:translateY(0);} }
     
@@ -237,46 +266,28 @@ def inject_global_styles():
     .hb-shiny{ background:linear-gradient(100deg,var(--text-dim) 35%,var(--text) 50%,var(--text-dim) 65%); background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation:hbShinySweep 3.2s linear infinite; }
     @keyframes hbShinySweep{ 0%{background-position:120% center;} 100%{background-position:-20% center;} }
 
-    /* ---------- PANEL FRAMEWORK STRUCTS ---------- */
-    .hb-glass{ background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); border:1px solid var(--line); border-radius:14px; padding:20px 22px; backdrop-filter:blur(14px); }
-    .hb-spotlight{ position:relative; border-radius:14px; border:1px solid var(--line); background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); padding:20px 22px; overflow:hidden; transition:transform .3s var(--ease), border-color .3s var(--ease); }
-    .hb-spotlight:hover{ transform:translateY(-3px); border-color:rgba(139,124,246,.35); }
-    .hb-spotlight::before{ content:""; position:absolute; inset:0; opacity:0; transition:opacity .3s var(--ease); background:radial-gradient(220px circle at 50% 0%, rgba(139,124,246,.18), transparent 70%); }
-    .hb-spotlight:hover::before{ opacity:1; }
-
-    /* ---------- ORB MATRIX CONFIGS ---------- */
-    .hb-orb-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
-    .hb-orb{ border-radius:50%; opacity:.45; box-shadow:0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); background:radial-gradient(circle at 35% 30%, var(--oc), transparent 70%), var(--oc); transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease; }
-    .hb-orb.active{ opacity:1; transform:scale(1.12); box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
-    
-    .hb-orb-seq-0{ animation: hbHighlightSeq0 8s infinite ease-in-out; transition: none !important; }
-    .hb-orb-seq-1{ animation: hbHighlightSeq1 8s infinite ease-in-out; transition: none !important; }
-    .hb-orb-seq-2{ animation: hbHighlightSeq2 8s infinite ease-in-out; transition: none !important; }
-    .hb-orb-seq-3{ animation: hbHighlightSeq3 8s infinite ease-in-out; transition: none !important; }
-    @keyframes hbHighlightSeq0 { 0%, 18% { opacity: 1; transform: scale(1.16); filter: brightness(1.35) saturate(1.2); } 23%, 100% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); } }
-    @keyframes hbHighlightSeq1 { 0%, 22% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); } 25%, 43% { opacity: 1; transform: scale(1.16); filter: brightness(1.35) saturate(1.2); } 48%, 100% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); } }
-    @keyframes hbHighlightSeq2 { 0%, 47% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); } 50%, 68% { opacity: 1; transform: scale(1.16); filter: brightness(1.35) saturate(1.2); } 73%, 100% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); } }
-    @keyframes hbHighlightSeq3 { 0%, 72% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); } 75%, 93% { opacity: 1; transform: scale(1.16); filter: brightness(1.35) saturate(1.2); } 98%, 100% { opacity: 0.45; transform: scale(1); filter: brightness(1) saturate(1); } }
-    .hb-orb-label{ font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--text-muted); text-align:center; }
-
-    .hb-status-dot{ width:7px; height:7px; border-radius:50%; background:var(--hero-green); box-shadow:0 0 8px var(--hero-green); display:inline-block; margin-right:6px; animation:hbBlink 2s ease-in-out infinite; }
-    @keyframes hbBlink{ 50%{opacity:.35;} }
-
-    /* ---------- METRIC LOADING FILL BARS ---------- */
-    .hb-progress-track{ width:100%; height:8px; border-radius:6px; background:var(--bg-elev-2); overflow:hidden; margin-top:8px;}
-    .hb-progress-fill{ height:100%; border-radius:6px; background:linear-gradient(90deg,var(--violet),var(--hero-green)); animation:hbFillIn 1.1s var(--ease) forwards; transform-origin:left; }
-    @keyframes hbFillIn{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
-
     .hb-eyebrow{ font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); }
     .hb-marquee{ overflow:hidden; -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent); mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent); }
     .hb-marquee-track{ display:flex; gap:26px; width:max-content; animation:hbMarquee 26s linear infinite; }
     .hb-marquee-track span{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); white-space:nowrap; }
     @keyframes hbMarquee{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
 
-    .hb-fade{ opacity:0; transform:translateY(14px); animation:hbFadeUp .6s var(--ease) forwards; }
-    @keyframes hbFadeUp{ to{ opacity:1; transform:translateY(0); } }
+    .hb-orb-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+    .hb-orb{ border-radius:50%; opacity:.45; box-shadow:0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); background:radial-gradient(circle at 35% 30%, var(--oc), transparent 70%), var(--oc); transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease; }
+    .hb-orb.active{ opacity:1; transform:scale(1.12); box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
+    
+    .hb-orb-seq-0{ animation: hbHighlightSeq0 8s infinite ease-in-out; }
+    .hb-orb-seq-1{ animation: hbHighlightSeq1 8s infinite ease-in-out; }
+    .hb-orb-seq-2{ animation: hbHighlightSeq2 8s infinite ease-in-out; }
+    .hb-orb-seq-3{ animation: hbHighlightSeq3 8s infinite ease-in-out; }
+    @keyframes hbHighlightSeq0 { 0%, 18% { opacity: 1; transform: scale(1.16); } 23%, 100% { opacity: 0.45; transform: scale(1); } }
+    @keyframes hbHighlightSeq1 { 0%, 22% { opacity: 0.45; transform: scale(1); } 25%, 43% { opacity: 1; transform: scale(1.16); } 48%, 100% { opacity: 0.45; transform: scale(1); } }
+    @keyframes hbHighlightSeq2 { 0%, 47% { opacity: 0.45; transform: scale(1); } 50%, 68% { opacity: 1; transform: scale(1.16); } 73%, 100% { opacity: 0.45; transform: scale(1); } }
+    @keyframes hbHighlightSeq3 { 0%, 72% { opacity: 0.45; transform: scale(1); } 75%, 93% { opacity: 1; transform: scale(1.16); } 98%, 100% { opacity: 0.45; transform: scale(1); } }
+    .hb-orb-label{ font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--text-muted); text-align:center; }
+    .hb-status-dot{ width:7px; height:7px; border-radius:50%; background:var(--hero-green); box-shadow:0 0 8px var(--hero-green); display:inline-block; margin-right:6px; animation:hbBlink 2s ease-in-out infinite; }
+    @keyframes hbBlink{ 50%{opacity:.35;} }
 
-    /* ---------- STRUCTURAL FORM LAYOUT HOVERS ---------- */
     div.stButton > button{ border-radius:10px !important; border:1px solid var(--line) !important; background:var(--bg-elev) !important; color:var(--text) !important; font-family:'Space Grotesk',sans-serif !important; transition:transform .2s var(--ease), border-color .2s var(--ease) !important; }
     div.stButton > button:hover{ transform:translateY(-2px) scale(1.015); border-color:rgba(139,124,246,.4) !important; }
     div.stButton > button[kind="primary"]{ background:linear-gradient(120deg,var(--violet),var(--violet-soft)) !important; border:none !important; }
@@ -290,9 +301,9 @@ def inject_global_styles():
     <div class="hb-noise"></div>
     """, unsafe_allow_html=True)
 
-def split_text(text, tag="h1", extra_class="", delay_step=0.03):
+def split_text_with_color(text, tag="h1", extra_class="", delay_step=0.03):
     spans = "".join(f'<span style="animation-delay:{i*delay_step:.3f}s">{("&nbsp;" if ch == " " else ch)}</span>' for i, ch in enumerate(text))
-    st.markdown(f'<{tag} class="hb-split {extra_class}">{spans}</{tag}>', unsafe_allow_html=True)
+    st.markdown(f'<{tag} class="hb-split-color {extra_class}">{spans}</{tag}>', unsafe_allow_html=True)
 
 def blur_text(text, tag="p", extra_class=""):
     st.markdown(f'<{tag} class="hb-blur {extra_class}">{text}</{tag}>', unsafe_allow_html=True)
@@ -305,9 +316,6 @@ def shiny_text(text, tag="span", extra_class=""):
 
 def eyebrow(text):
     st.markdown(f'<div class="hb-eyebrow">{text}</div>', unsafe_allow_html=True)
-
-def spotlight_card_html(inner_html):
-    st.markdown(f'<div class="hb-spotlight">{inner_html}</div>', unsafe_allow_html=True)
 
 def interactive_hover_tilt_card(inner_html, highlight_color="var(--violet)"):
     st.markdown(f'<div class="hb-tilt-hover-card" style="--brc:{highlight_color};">{inner_html}</div>', unsafe_allow_html=True)
@@ -328,12 +336,6 @@ def marquee(items, speed=26):
     st.markdown(f"""
     <div class="hb-marquee"><div class="hb-marquee-track" style="animation-duration:{speed}s;">{spans}</div></div>
     """, unsafe_allow_html=True)
-
-def fade_grid(htmls, columns=3, stagger=0.08):
-    cols = st.columns(columns)
-    for i, html in enumerate(htmls):
-        with cols[i % columns]:
-            st.markdown(f'<div class="hb-fade" style="animation-delay:{i*stagger:.2f}s">{html}</div>', unsafe_allow_html=True)
 
 def orb(color, label, active=False, size=70, loop_idx=None):
     if loop_idx is not None:
@@ -411,7 +413,7 @@ with st.sidebar:
 # 🏠 HOME PAGE MODULE
 # =====================================================================
 if app_mode == "Home":
-    split_text("SHOPPER'S SPECTRUM", tag="h1")
+    split_text_with_color("SHOPPER'S SPECTRUM", tag="h1")
     typewriter_widget([
         "Segment customers by RFM behavior.",
         "Surface look-alike product recommendations.",
@@ -430,14 +432,6 @@ if app_mode == "Home":
         with col:
             orb(SEGMENT_COLOR_MAP[i], BUSINESS_SEGMENT_MAP[i], size=70, loop_idx=i)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    eyebrow("SYSTEM STATUS")
-    fade_grid([
-        f'<div class="hb-eyebrow">MODEL</div><h3 style="margin:6px 0 0;">{gradient_text("Active")}</h3><div style="color:var(--text-dim); font-size:13px; margin-top:4px;">Embedded pipeline v3.0</div>',
-        f'<div class="hb-eyebrow">RECOMMENDATION ENGINE</div><h3 style="margin:6px 0 0;">{gradient_text("Online")}</h3><div style="color:var(--text-dim); font-size:13px; margin-top:4px;">Vector space matrix</div>',
-        f'<div class="hb-eyebrow">DATA INGESTION</div><h3 style="margin:6px 0 0;">{gradient_text("Synced")}</h3><div style="color:var(--text-dim); font-size:13px; margin-top:4px;">description.csv active</div>',
-    ], columns=3)
-
     st.markdown("<br><br>", unsafe_allow_html=True)
     eyebrow("CATALOG SAMPLE")
     marquee(all_unique_products[:18] if all_unique_products else ["No catalog loaded"])
@@ -446,8 +440,8 @@ if app_mode == "Home":
 # 📋 CUSTOMER SEGMENTATION MODULE
 # =====================================================================
 elif app_mode == "Clustering":
-    # Activated dynamic text animation reveal for the main segmentation header
-    split_text("Customer Segmentation", tag="h1")
+    # Customer Segmentation header with kinetic multi-color shift wave
+    split_text_with_color("Customer Segmentation", tag="h1")
     blur_text("Determine a customer's strategic group instantly by updating their active behavior variables below:")
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -476,39 +470,26 @@ elif app_mode == "Clustering":
         result_col, orb_col = st.columns([2, 1])
 
         with result_col:
-            # Replaced with the interactive 3D Hover Tilt and Morphing panel framework
             interactive_hover_tilt_card(f"""
                 <div class="hb-eyebrow">PREDICTED STRATEGIC COHORT</div>
                 <h2 style="margin:8px 0 14px;">{shiny_text(resolved_label)}</h2>
             """, highlight_color=seg_color)
             
             decrypt_text_widget(resolved_label, height=38, font_size=20, color=seg_color)
-            st.markdown(f'<div style="margin-top:10px; color:var(--text-dim); font-size:13px;">Relative confidence vs. nearest competing cluster</div>', unsafe_allow_html=True)
+            
+            # Sub-metrics featuring dynamic hue pulsing animations
+            st.markdown(f'<div class="hb-animated-confidence-text">Relative confidence vs. nearest competing cluster</div>', unsafe_allow_html=True)
             progress_glow(confidence_pct, color_from=seg_color, color_to="var(--hero-green)")
             st.markdown(f'<div style="text-align:right; font-family:JetBrains Mono,monospace; font-size:12px; color:var(--text-dim); margin-top:4px;">{confidence_pct}%</div>', unsafe_allow_html=True)
 
         with orb_col:
             orb(seg_color, resolved_label, active=True, size=90)
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        eyebrow("ALL RAW SEGMENT MODEL DISTANCES")
-        dist_cols = st.columns(4)
-        for cid, col in enumerate(dist_cols):
-            with col:
-                is_winner = (cid == res["model_id"])
-                spotlight_card_html(f"""
-                    <div class="hb-eyebrow">CLUSTER {cid}</div>
-                    <div style="font-weight:600; margin:6px 0;">{BUSINESS_SEGMENT_MAP[cid]}</div>
-                    <div class="mono" style="color:{SEGMENT_COLOR_MAP[cid] if is_winner else 'var(--text-dim)'}; font-size:13px;">
-                        distance: {distances[cid]:.3f}{' ★' if is_winner else ''}
-                    </div>
-                """)
-
 # =====================================================================
 # 📊 PRODUCT RECOMMENDATION MODULE
 # =====================================================================
 elif app_mode == "Recommendation":
-    split_text("Product Recommender", tag="h1")
+    split_text_with_color("Product Recommender", tag="h1")
     blur_text("Input a product title below to instantly discover 5 highly correlated items bought by similar shoppers, or select from the alphabetical catalog directory below.")
 
     if "selected_product" not in st.session_state:
@@ -535,7 +516,6 @@ elif app_mode == "Recommendation":
     if st.session_state.selected_product:
         recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
         
-        # Replaced with the interactive 3D Hover Tilt and Morphing panel framework
         interactive_hover_tilt_card(f"""
             <div class="hb-eyebrow">RECOMMENDED CO-PURCHASED PRODUCTS FOR:</div>
             <h3 style="margin:8px 0 14px;">{st.session_state.selected_product}</h3>

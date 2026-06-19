@@ -128,7 +128,7 @@ def compute_live_recommendation_vector(target_item, search_pool):
     return recommended_items
 
 # =====================================================================
-# 🎨 UI STYLING ARCHITECTURE MODULE (FIXED ANIMATED TEXT FIELDS)
+# 🎨 UI STYLING ARCHITECTURE MODULE
 # =====================================================================
 def inject_global_styles():
     st.markdown("""
@@ -157,9 +157,15 @@ def inject_global_styles():
     h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif !important; color:var(--text); }
     code, .mono { font-family:'JetBrains Mono',monospace; }
 
-    /* Animated Text Box Controls - Scoped Specifically to Labels, Values and Focus Rules */
-    .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
-        color: #ffffff !important;
+    /* RFM & Text Box Inputs Configuration: Font color changed from White to Black */
+    .stNumberInput input {
+        color: #000000 !important;
+        font-weight: 600 !important;
+        background-color: #ffffff !important;
+        transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease) !important;
+    }
+    
+    .stSelectbox div[data-baseweb="select"] {
         transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease) !important;
     }
     
@@ -182,6 +188,43 @@ def inject_global_styles():
     ul[role="listbox"] li:hover {
         background-color: rgba(139,124,246, 0.15) !important;
         padding-left: 20px !important;
+    }
+
+    /* ---------- DYNAMIC TILT & DISTORT ANIMATION ---------- */
+    .hb-tilt-card {
+        position: relative;
+        background: var(--bg-elev);
+        padding: 22px 24px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(243,241,236,0.12);
+        perspective: 1000px;
+        animation: hbTiltDistort 1.2s var(--ease) forwards;
+        transform-style: preserve-3d;
+    }
+
+    @keyframes hbTiltDistort {
+        0% {
+            transform: rotateX(0deg) rotateY(0deg) scale(0.92);
+            border-radius: 14px;
+            border-color: rgba(243,241,236,0.1);
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+        }
+        30% {
+            transform: rotateX(12deg) rotateY(-8deg) scale(1.02);
+            border-radius: 24px 8px 24px 12px; /* Fluid shifting shape */
+            border-color: var(--brc);
+            box-shadow: -10px 15px 30px rgba(0,0,0,0.5), 0 0 20px var(--brc);
+        }
+        60% {
+            transform: rotateX(-5deg) rotateY(6deg) scale(0.99);
+            border-radius: 10px 20px 12px 24px;
+        }
+        100% {
+            transform: rotateX(0deg) rotateY(0deg) scale(1);
+            border-radius: 16px; /* Final polished container shape */
+            border-color: var(--brc);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
     }
 
     /* ---------- AURORA BACKGROUNDS ---------- */
@@ -216,9 +259,6 @@ def inject_global_styles():
     .hb-spotlight:hover{ transform:translateY(-3px); border-color:rgba(139,124,246,.35); }
     .hb-spotlight::before{ content:""; position:absolute; inset:0; opacity:0; transition:opacity .3s var(--ease); background:radial-gradient(220px circle at 50% 0%, rgba(139,124,246,.18), transparent 70%); }
     .hb-spotlight:hover::before{ opacity:1; }
-    
-    .hb-border-card{ position:relative; border-radius:14px; padding:20px 22px; background:var(--bg-elev); margin-bottom:15px; }
-    .hb-border-card::before{ content:""; position:absolute; inset:0; border-radius:14px; padding:1px; background:linear-gradient(120deg,var(--violet),transparent 40%, var(--hero-green) 80%); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
 
     /* ---------- ORB MATRIX CONFIGS ---------- */
     .hb-orb-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
@@ -285,22 +325,8 @@ def eyebrow(text):
 def spotlight_card_html(inner_html):
     st.markdown(f'<div class="hb-spotlight">{inner_html}</div>', unsafe_allow_html=True)
 
-def border_card_html(inner_html):
-    st.markdown(f'<div class="hb-border-card">{inner_html}</div>', unsafe_allow_html=True)
-
-def orb(color, label, active=False, size=70, loop_idx=None):
-    if loop_idx is not None:
-        cls = f"hb-orb hb-orb-seq-{loop_idx}"
-        style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
-    else:
-        cls = "hb-orb active" if active else "hb-orb"
-        style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
-    st.markdown(f"""
-    <div class="hb-orb-wrap">
-        <div class="{cls}" {style}></div>
-        <div class="hb-orb-label">{label}</div>
-    </div>
-    """, unsafe_allow_html=True)
+def animated_tilt_card(inner_html, highlight_color="var(--violet)"):
+    st.markdown(f'<div class="hb-tilt-card" style="--brc:{highlight_color};">{inner_html}</div>', unsafe_allow_html=True)
 
 def status_pill(text):
     st.markdown(f'<div class="hb-eyebrow"><span class="hb-status-dot"></span>{text}</div>', unsafe_allow_html=True)
@@ -324,6 +350,20 @@ def fade_grid(htmls, columns=3, stagger=0.08):
     for i, html in enumerate(htmls):
         with cols[i % columns]:
             st.markdown(f'<div class="hb-fade" style="animation-delay:{i*stagger:.2f}s">{html}</div>', unsafe_allow_html=True)
+
+def orb(color, label, active=False, size=70, loop_idx=None):
+    if loop_idx is not None:
+        cls = f"hb-orb hb-orb-seq-{loop_idx}"
+        style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
+    else:
+        cls = "hb-orb active" if active else "hb-orb"
+        style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
+    st.markdown(f"""
+    <div class="hb-orb-wrap">
+        <div class="{cls}" {style}></div>
+        <div class="hb-orb-label">{label}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 def typewriter_widget(strings, height=46, font_size=20, color="#8b7cf6"):
     strings_js = str(strings).replace("'", '"')
@@ -451,10 +491,12 @@ elif app_mode == "Clustering":
         result_col, orb_col = st.columns([2, 1])
 
         with result_col:
-            border_card_html(f"""
+            # Replaced with the responsive dynamic structural transformation panel
+            animated_tilt_card(f"""
                 <div class="hb-eyebrow">PREDICTED STRATEGIC COHORT</div>
                 <h2 style="margin:8px 0 14px;">{shiny_text(resolved_label)}</h2>
-            """)
+            """, highlight_color=seg_color)
+            
             decrypt_text_widget(resolved_label, height=38, font_size=20, color=seg_color)
             st.markdown(f'<div style="margin-top:10px; color:var(--text-dim); font-size:13px;">Relative confidence vs. nearest competing cluster</div>', unsafe_allow_html=True)
             progress_glow(confidence_pct, color_from=seg_color, color_to="var(--hero-green)")
@@ -490,66 +532,4 @@ elif app_mode == "Recommendation":
         st.session_state.active_letter = "A"
 
     try:
-        default_index = all_unique_products.index(st.session_state.selected_product)
-    except ValueError:
-        default_index = 0
-
-    search_query = st.selectbox(
-        "Enter Product Name",
-        options=all_unique_products,
-        index=default_index
-    )
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("Get Recommendations", type="primary"):
-        st.session_state.selected_product = search_query
-        st.rerun()
-
-    if st.session_state.selected_product:
-        recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
-        
-        border_card_html(f"""
-            <div class="hb-eyebrow">RECOMMENDED CO-PURCHASED PRODUCTS FOR:</div>
-            <h3 style="margin:8px 0 14px;">{st.session_state.selected_product}</h3>
-        """)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        for item in recommendations:
-            st.markdown(f"✨ **{item}**")
-
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
-    eyebrow("BROWSE CATALOG INTERACTIVELY")
-
-    alphabet_keys = sorted(list(catalog_alphabet_index.keys()))
-    if alphabet_keys:
-        letter_columns = st.columns(len(alphabet_keys))
-        for idx, letter in enumerate(alphabet_keys):
-            with letter_columns[idx]:
-                b_type = "primary" if st.session_state.active_letter == letter else "secondary"
-                if st.button(letter, key=f"btn_let_{letter}", type=b_type, use_container_width=True):
-                    st.session_state.active_letter = letter
-                    st.rerun()
-
-        filtered_products = catalog_alphabet_index.get(st.session_state.active_letter, [])
-        if filtered_products:
-            total_items = len(filtered_products)
-            items_per_column = int(np.ceil(total_items / 3))
-            col_left, col_mid, col_right = st.columns(3)
-
-            with col_left:
-                for item in filtered_products[0:items_per_column]:
-                    if st.button("📖 " + item, key=f"dir_lnk_{item}", use_container_width=True):
-                        st.session_state.selected_product = item
-                        st.rerun()
-            with col_mid:
-                for item in filtered_products[items_per_column : items_per_column * 2]:
-                    if st.button("📖 " + item, key=f"dir_lnk_{item}", use_container_width=True):
-                        st.session_state.selected_product = item
-                        st.rerun()
-            with col_right:
-                for item in filtered_products[items_per_column * 2 :]:
-                    if st.button("📖 " + item, key=f"dir_lnk_{item}", use_container_width=True):
-                        st.session_state.selected_product = item
-                        st.rerun()
-        else:
-            st.write("*No products found matching this filter letter.*")
+        default_index = all_unique_products.index(st.session_state.selected

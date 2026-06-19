@@ -115,24 +115,25 @@ if app_mode == "🖥️ Home":
     * **Customer Segmentation Platform:** Input continuous live customer RFM scores to immediately isolate behavioral categories.
     * **Product Recommendation Engine:** Run collaborative item-to-item matching using high-dimensional cosine similarity arrays.
     
-    **Current Inventory Status:** Loaded `{len(all_unique_products):,}` unique items directly from your custom `description.csv` asset.
+    **Current Inventory Status:** Loaded `{len(all_unique_products):,}` unique products directly from your custom `description.csv` asset.
     """)
     
     col1, col2, col3 = st.columns(3)
-    col1.metric(label="Model Status", value="Active", delta="Embedded Pipeline v2.9")
+    col1.metric(label="Model Status", value="Active", delta="Embedded Pipeline v3.0")
     col2.metric(label="Recommendation Engine", value="Online", delta="Vector Space Matrix")
     col3.metric(label="Data Ingestion Pipes", value="Synced", delta="description.csv Active")
 
 # =====================================================================
-# 📋 CUSTOMER SEGMENTATION MODULE
+# 📋 CUSTOMER SEGMENTATION MODULE (WITH UPDATED DEFAULT VALUES)
 # =====================================================================
 elif app_mode == "📋 Clustering":
     st.title("Customer Segmentation")
     st.write("Determine a customer's strategic group instantly by updating their active behavior variables below:")
     
-    recency_input = st.number_input("Recency (days since last purchase)", min_value=0, max_value=2000, value=325, step=1)
+    # Updated default variables requested: Recency=1, Frequency=1, Monetary=100.00
+    recency_input = st.number_input("Recency (days since last purchase)", min_value=0, max_value=2000, value=1, step=1)
     frequency_input = st.number_input("Frequency (number of purchases)", min_value=1, max_value=10000, value=1, step=1)
-    monetary_input = st.number_input("Monetary (total spend)", min_value=0.0, max_value=5000000.0, value=765322.00, step=10.0)
+    monetary_input = st.number_input("Monetary (total spend)", min_value=0.0, max_value=5000000.0, value=100.00, step=10.0)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -152,11 +153,13 @@ elif app_mode == "📋 Clustering":
         st.write(f"This customer belongs to: {resolved_label}")
 
 # =====================================================================
-# 📊 PRODUCT RECOMMENDATION MODULE (WITH MULTI-COLUMN INTERACTIVE FILTER)
+# 📊 PRODUCT RECOMMENDATION MODULE (WITH CUSTOM ENHANCED INSTRUCTIONS)
 # =====================================================================
 elif app_mode == "📊 Recommendation":
     st.title("Product Recommender")
-    st.write("Input a product title below to instantly discover 5 highly correlated items bought by similar shoppers.")
+    
+    # Cleaned instructional bold layout rule injected explicitly above selector box
+    st.markdown("**Input a product title below to instantly discover 5 highly correlated items bought by similar shoppers or select from alphabetical list of catalogue directory below**")
     
     # Initialize session states cleanly
     if "selected_product" not in st.session_state:
@@ -174,7 +177,8 @@ elif app_mode == "📊 Recommendation":
         "Enter Product Name",
         options=all_unique_products,
         index=default_index,
-        key="main_recommender_dropdown"
+        key="main_recommender_dropdown",
+        label_visibility="collapsed" # Hides duplicated minor prompt text fields
     )
 
     st.markdown("<br>", unsafe_allow_html=True)

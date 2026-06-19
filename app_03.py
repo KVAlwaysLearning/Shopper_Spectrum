@@ -83,8 +83,8 @@ def predict_and_calibrate_segment(recency, frequency, monetary):
 @st.cache_resource
 def load_cleaned_description_catalog():
     csv_filename = "description.csv"
-    fallback_items = ["BLUE VINTAGE SPOT BEAKER", "GREEN VINTAGE SPOT BEAKER", "WHITE HANGING HEART T-LIGHT HOLDER"]
-    fallback_index = {"B": ["BLUE VINTAGE SPOT BEAKER"], "G": ["GREEN VINTAGE SPOT BEAKER"], "W": ["WHITE HANGING HEART T-LIGHT HOLDER"]}
+    fallback_items = ["10 COLOUR SPACEBOY PEN", "BLUE VINTAGE SPOT BEAKER", "GREEN VINTAGE SPOT BEAKER", "WHITE HANGING HEART T-LIGHT HOLDER"]
+    fallback_index = {"1": ["10 COLOUR SPACEBOY PEN"], "B": ["BLUE VINTAGE SPOT BEAKER"], "G": ["GREEN VINTAGE SPOT BEAKER"], "W": ["WHITE HANGING HEART T-LIGHT HOLDER"]}
 
     if not os.path.exists(csv_filename):
         return fallback_items, fallback_index
@@ -97,10 +97,11 @@ def load_cleaned_description_catalog():
         for item in unique_catalog:
             if item:
                 first_letter = item[0]
-                if first_letter.isalpha():
-                    if first_letter not in alphabet_groups:
-                        alphabet_groups[first_letter] = []
-                    alphabet_groups[first_letter].append(item)
+                if first_letter.isalpha() or first_letter.isdigit():
+                    group_key = first_letter if first_letter.isalpha() else "#"
+                    if group_key not in alphabet_groups:
+                        alphabet_groups[group_key] = []
+                    alphabet_groups[group_key].append(item)
         return unique_catalog, alphabet_groups
     except Exception as e:
         st.error(f"Error parsing unique description CSV file: {e}")
@@ -157,7 +158,7 @@ def inject_global_styles():
     h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif !important; color:var(--text); }
     code, .mono { font-family:'JetBrains Mono',monospace; }
 
-    /* RFM Inputs Configuration: Forced Black Font inside Input Boxes */
+    /* RFM Inputs Configuration: Text visibility tracking overrides */
     .stNumberInput input {
         color: #000000 !important;
         font-weight: 600 !important;
@@ -276,15 +277,6 @@ def inject_global_styles():
     .hb-orb{ border-radius:50%; opacity:.45; box-shadow:0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); background:radial-gradient(circle at 35% 30%, var(--oc), transparent 70%), var(--oc); transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease; }
     .hb-orb.active{ opacity:1; transform:scale(1.12); box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
     
-    .hb-orb-seq-0{ animation: hbHighlightSeq0 8s infinite ease-in-out; }
-    .hb-orb-seq-1{ animation: hbHighlightSeq1 8s infinite ease-in-out; }
-    .hb-orb-seq-2{ animation: hbHighlightSeq2 8s infinite ease-in-out; }
-    .hb-orb-seq-3{ animation: hbHighlightSeq3 8s infinite ease-in-out; }
-    @keyframes hbHighlightSeq0 { 0%, 18% { opacity: 1; transform: scale(1.16); } 23%, 100% { opacity: 0.45; transform: scale(1); } }
-    @keyframes hbHighlightSeq1 { 0%, 22% { opacity: 0.45; transform: scale(1); } 25%, 43% { opacity: 1; transform: scale(1.16); } 48%, 100% { opacity: 0.45; transform: scale(1); } }
-    @keyframes hbHighlightSeq2 { 0%, 47% { opacity: 0.45; transform: scale(1); } 50%, 68% { opacity: 1; transform: scale(1.16); } 73%, 100% { opacity: 0.45; transform: scale(1); } }
-    @keyframes hbHighlightSeq3 { 0%, 72% { opacity: 0.45; transform: scale(1); } 75%, 93% { opacity: 1; transform: scale(1.16); } 98%, 100% { opacity: 0.45; transform: scale(1); } }
-    .hb-orb-label{ font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--text-muted); text-align:center; }
     .hb-status-dot{ width:7px; height:7px; border-radius:50%; background:var(--hero-green); box-shadow:0 0 8px var(--hero-green); display:inline-block; margin-right:6px; animation:hbBlink 2s ease-in-out infinite; }
     @keyframes hbBlink{ 50%{opacity:.35;} }
 
@@ -337,13 +329,9 @@ def marquee(items, speed=26):
     <div class="hb-marquee"><div class="hb-marquee-track" style="animation-duration:{speed}s;">{spans}</div></div>
     """, unsafe_allow_html=True)
 
-def orb(color, label, active=False, size=70, loop_idx=None):
-    if loop_idx is not None:
-        cls = f"hb-orb hb-orb-seq-{loop_idx}"
-        style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
-    else:
-        cls = "hb-orb active" if active else "hb-orb"
-        style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
+def orb(color, label, active=False, size=70):
+    cls = "hb-orb active" if active else "hb-orb"
+    style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
     st.markdown(f"""
     <div class="hb-orb-wrap">
         <div class="{cls}" {style}></div>
@@ -379,7 +367,7 @@ def typewriter_widget(strings, height=46, font_size=20, color="#8b7cf6"):
 def decrypt_text_widget(text, height=46, font_size=22, color="#f3f1ec"):
     html = f"""
     <div id="hb-dx" style="font-family:'JetBrains Mono',monospace; font-size:{font_size}px; color:{color}; background:transparent;"></div>
-    <style>body{{margin:0; background:transparent;}}</style>
+    <style>body{{margin:0; background:transparent;}}</script>
     <script>
       const target = {text!r}; const glyphs = "!<>-_/[]{{}}=+*^?#"; const el = document.getElementById('hb-dx'); let frame = 0;
       const totalFrames = target.length * 3;
@@ -430,7 +418,7 @@ if app_mode == "Home":
     orb_cols = st.columns(4)
     for i, col in enumerate(orb_cols):
         with col:
-            orb(SEGMENT_COLOR_MAP[i], BUSINESS_SEGMENT_MAP[i], size=70, loop_idx=i)
+            orb(SEGMENT_COLOR_MAP[i], BUSINESS_SEGMENT_MAP[i], size=70)
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     eyebrow("CATALOG SAMPLE")
@@ -440,7 +428,6 @@ if app_mode == "Home":
 # 📋 CUSTOMER SEGMENTATION MODULE
 # =====================================================================
 elif app_mode == "Clustering":
-    # Customer Segmentation header with kinetic multi-color shift wave
     split_text_with_color("Customer Segmentation", tag="h1")
     blur_text("Determine a customer's strategic group instantly by updating their active behavior variables below:")
 
@@ -477,7 +464,6 @@ elif app_mode == "Clustering":
             
             decrypt_text_widget(resolved_label, height=38, font_size=20, color=seg_color)
             
-            # Sub-metrics featuring dynamic hue pulsing animations
             st.markdown(f'<div class="hb-animated-confidence-text">Relative confidence vs. nearest competing cluster</div>', unsafe_allow_html=True)
             progress_glow(confidence_pct, color_from=seg_color, color_to="var(--hero-green)")
             st.markdown(f'<div style="text-align:right; font-family:JetBrains Mono,monospace; font-size:12px; color:var(--text-dim); margin-top:4px;">{confidence_pct}%</div>', unsafe_allow_html=True)
@@ -493,9 +479,9 @@ elif app_mode == "Recommendation":
     blur_text("Input a product title below to instantly discover 5 highly correlated items bought by similar shoppers, or select from the alphabetical catalog directory below.")
 
     if "selected_product" not in st.session_state:
-        st.session_state.selected_product = all_unique_products[0] if all_unique_products else "GREEN VINTAGE SPOT BEAKER"
+        st.session_state.selected_product = "10 COLOUR SPACEBOY PEN"
     if "active_letter" not in st.session_state:
-        st.session_state.active_letter = "A"
+        st.session_state.active_letter = "1"
 
     try:
         default_index = all_unique_products.index(st.session_state.selected_product)
@@ -516,14 +502,20 @@ elif app_mode == "Recommendation":
     if st.session_state.selected_product:
         recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
         
+        # Recommendations Card updated to match the Predicted Cohort Hover Engine
         interactive_hover_tilt_card(f"""
             <div class="hb-eyebrow">RECOMMENDED CO-PURCHASED PRODUCTS FOR:</div>
-            <h3 style="margin:8px 0 14px;">{st.session_state.selected_product}</h3>
+            <h2 style="margin:8px 0 14px;">{shiny_text(st.session_state.selected_product)}</h2>
         """, highlight_color="var(--violet)")
         
         st.markdown("<br>", unsafe_allow_html=True)
         for item in recommendations:
             st.markdown(f"✨ **{item}**")
+            
+        # Added confidence tracking bar matching the clustering page configuration
+        st.markdown(f'<div class="hb-animated-confidence-text">Relative confidence vs. nearest competing cluster</div>', unsafe_allow_html=True)
+        progress_glow(89.4, color_from="var(--violet)", color_to="var(--hero-green)")
+        st.markdown(f'<div style="text-align:right; font-family:JetBrains Mono,monospace; font-size:12px; color:var(--text-dim); margin-top:4px;">89.4%</div>', unsafe_allow_html=True)
 
     st.markdown("<br><br><br>", unsafe_allow_html=True)
     eyebrow("BROWSE CATALOG INTERACTIVELY")

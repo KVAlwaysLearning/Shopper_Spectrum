@@ -83,11 +83,25 @@ def predict_and_calibrate_segment(recency, frequency, monetary):
 @st.cache_resource
 def load_cleaned_description_catalog():
     csv_filename = "description.csv"
-    fallback_items = ["10 COLOUR SPACEBOY PEN", "BLUE VINTAGE SPOT BEAKER", "GREEN VINTAGE SPOT BEAKER", "WHITE HANGING HEART T-LIGHT HOLDER"]
-    fallback_index = {"1": ["10 COLOUR SPACEBOY PEN"], "B": ["BLUE VINTAGE SPOT BEAKER"], "G": ["GREEN VINTAGE SPOT BEAKER"], "W": ["WHITE HANGING HEART T-LIGHT HOLDER"]}
+    fallback_items = [
+        "10 COLOUR SPACEBOY PEN", "12 COLOURED PARTY BALLOONS", "12 DAISY PEGS IN WOOD BOX", 
+        "12 EGG HOUSE PAINTED WOOD", "12 HANGING EGGS HAND PAINTED", "12 IVORY ROSE PEG PLACE SETTINGS", 
+        "12 MESSAGE CARDS WITH ENVELOPES", "12 PENCIL SMALL TUBE WOODLAND", "12 PENCILS SMALL TUBE RED RETROSPOT", 
+        "12 PENCILS SMALL TUBE SKULL", "12 PENCILS TALL TUBE POSY", "12 PENCILS TALL TUBE RED RETROSPOT", 
+        "12 PENCILS TALL TUBE SKULLS", "12 PENCILS TALL TUBE WOODLAND", "12 PINK HEN+CHICKS IN BASKET", 
+        "12 PINK ROSE PEG PLACE SETTINGS", "12 RED ROSE PEG PLACE SETTINGS", "15 PINK FLUFFY CHICKS IN BOX"
+    ]
+    
+    alphabet_groups = {}
+    for item in fallback_items:
+        first_letter = item[0]
+        group_key = first_letter if first_letter.isalpha() else "#"
+        if group_key not in alphabet_groups:
+            alphabet_groups[group_key] = []
+        alphabet_groups[group_key].append(item)
 
     if not os.path.exists(csv_filename):
-        return fallback_items, fallback_index
+        return fallback_items, alphabet_groups
 
     try:
         df = pd.read_csv(csv_filename)
@@ -105,7 +119,7 @@ def load_cleaned_description_catalog():
         return unique_catalog, alphabet_groups
     except Exception as e:
         st.error(f"Error parsing unique description CSV file: {e}")
-        return fallback_items, fallback_index
+        return fallback_items, alphabet_groups
 
 all_unique_products, catalog_alphabet_index = load_cleaned_description_catalog()
 
@@ -247,7 +261,7 @@ def inject_global_styles():
         100% { background-position: 200% center; filter: brightness(1); }
     }
 
-    /* ---------- FIX: REFACTORED INDEPENDENT ORB MATRIX PULSING ---------- */
+    /* ---------- REFACTORED INDEPENDENT ORB MATRIX PULSING ---------- */
     .hb-orb-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
     .hb-orb { 
         border-radius: 50%; 
@@ -255,7 +269,6 @@ def inject_global_styles():
         transition: transform 0.4s var(--ease), opacity 0.4s var(--ease), box-shadow 0.4s var(--ease);
     }
     
-    /* Sequential rhythmic breathing loop for the home screen system view */
     .hb-orb-seq-0 { animation: hbOrbPulseLoop 4s ease-in-out infinite; animation-delay: 0.0s; }
     .hb-orb-seq-1 { animation: hbOrbPulseLoop 4s ease-in-out infinite; animation-delay: 1.0s; }
     .hb-orb-seq-2 { animation: hbOrbPulseLoop 4s ease-in-out infinite; animation-delay: 2.0s; }
@@ -266,7 +279,6 @@ def inject_global_styles():
         50% { opacity: 1.0; transform: scale(1.15); box-shadow: 0 0 35px var(--oc), inset 0 0 15px rgba(255,255,255,0.3); }
     }
     
-    /* Static active override configuration rule */
     .hb-orb.active-fixed {
         opacity: 1 !important;
         transform: scale(1.12);
@@ -274,6 +286,38 @@ def inject_global_styles():
         animation: hbOrbPulseLoop 3s ease-in-out infinite alternate !important;
     }
     .hb-orb-label { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: center; }
+
+    /* ---------- FIX: RESTORED INFINITE LOOP MARQUEE SLIDER ---------- */
+    .hb-marquee {
+        width: 100%;
+        overflow: hidden;
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 16px 0;
+        display: flex;
+    }
+    .hb-marquee-track {
+        display: flex;
+        white-space: nowrap;
+        gap: 40px;
+        animation: hbMarqueeScroll 35s linear infinite;
+    }
+    .hb-marquee-track span {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+        color: var(--text-muted);
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 6px 14px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    @keyframes hbMarqueeScroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
 
     /* ---------- DECORATIVE MATRIX BACKGROUND LAYER ELEMENTS ---------- */
     .hb-aurora { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
@@ -345,10 +389,15 @@ def progress_glow(pct, color_from="var(--violet)", color_to="var(--hero-green)")
     </div>
     """, unsafe_allow_html=True)
 
-def marquee(items, speed=26):
-    spans = "".join(f"<span>{i}</span>" for i in (items + items))
+def marquee(items, speed=35):
+    # Duplicating pool elements inside the layout to allow clean seam overlaps during transformation loops
+    spans = "".join(f"<span>{item}</span>" for item in items)
     st.markdown(f"""
-    <div class="hb-marquee"><div class="hb-marquee-track" style="animation-duration:{speed}s;">{spans}</div></div>
+    <div class="hb-marquee">
+        <div class="hb-marquee-track" style="animation-duration:{speed}s;">
+            {spans}{spans}
+        </div>
+    </div>
     """, unsafe_allow_html=True)
 
 def orb(color, label, active=False, size=70, loop_idx=None):

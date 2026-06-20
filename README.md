@@ -129,20 +129,20 @@ The interface uses an advanced, highly responsive front-end layer embedded direc
 ### Step-by-Step Execution
 
 1. **Clone the Repository:**
+
 ```bash
    git clone [https://github.com/yourusername/shop-spectrum.git](https://github.com/yourusername/shop-spectrum.git)
    cd shop-spectrum
-
 ```
 
 2. **Establish and Activate a Virtual Environment:**
+
 ```bash
 python -m venv venv
 # On Windows:
 venv\Scripts\activate
 # On macOS/Linux:
 source venv/bin/activate
-
 ```
 
 

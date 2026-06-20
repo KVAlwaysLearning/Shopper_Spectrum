@@ -129,7 +129,7 @@ The interface uses an advanced, highly responsive front-end layer embedded direc
 ### Step-by-Step Execution
 
 1. **Clone the Repository:**
-   ```bash
+```bash
    git clone [https://github.com/yourusername/shop-spectrum.git](https://github.com/yourusername/shop-spectrum.git)
    cd shop-spectrum
 

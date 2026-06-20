@@ -158,7 +158,7 @@ def inject_global_styles():
     h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif !important; color:var(--text); }
     code, .mono { font-family:'JetBrains Mono',monospace; }
 
-    /* RFM Inputs Configuration: Text visibility tracking overrides */
+    /* Input text color configuration rules */
     .stNumberInput input {
         color: #000000 !important;
         font-weight: 600 !important;
@@ -174,20 +174,6 @@ def inject_global_styles():
         transform: translateY(-1px);
         border-color: rgba(139,124,246, 0.6) !important;
         box-shadow: 0 0 12px rgba(139,124,246, 0.25) !important;
-    }
-    
-    ul[role="listbox"] {
-        background-color: var(--bg-elev-2) !important;
-        border: 1px solid var(--line) !important;
-        transition: all 0.2s var(--ease);
-    }
-    ul[role="listbox"] li {
-        color: #ffffff !important;
-        transition: background 0.15s var(--ease), padding-left 0.15s var(--ease) !important;
-    }
-    ul[role="listbox"] li:hover {
-        background-color: rgba(139,124,246, 0.15) !important;
-        padding-left: 20px !important;
     }
 
     /* ---------- INTERACTIVE HOVER 3D TILT & SHAPE MORPH ---------- */
@@ -224,7 +210,6 @@ def inject_global_styles():
         100% { color: var(--amber); }
     }
 
-    /* Relative Confidence text shift color animation */
     .hb-animated-confidence-text {
         font-family: 'Space Grotesk', sans-serif;
         font-weight: 600;
@@ -238,51 +223,88 @@ def inject_global_styles():
         100% { color: var(--hero-green); text-shadow: 0 0 8px rgba(61,220,151,0.2); }
     }
 
-    /* ---------- METRIC PROGRESS FILL GLOWS ---------- */
-    .hb-progress-track{ width:100%; height:8px; border-radius:6px; background:var(--bg-elev-2); overflow:hidden; margin-top:8px;}
-    .hb-progress-fill{ height:100%; border-radius:6px; background:linear-gradient(90deg,var(--violet),var(--hero-green)); animation:hbFillIn 1.1s var(--ease) forwards, hbGlowPan 3s linear infinite; background-size: 200% auto; transform-origin:left; }
-    @keyframes hbFillIn{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
-    @keyframes hbGlowPan { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+    /* ---------- GLOBALIZED METRIC BAR PROGRESS GLOW ANIMATIONS ---------- */
+    .hb-progress-track { 
+        width: 100%; 
+        height: 10px; 
+        border-radius: 6px; 
+        background: var(--bg-elev-2); 
+        overflow: hidden; 
+        margin-top: 8px;
+        border: 1px solid rgba(255,255,255,0.03);
+    }
+    .hb-progress-fill { 
+        height: 100%; 
+        border-radius: 6px; 
+        transform-origin: left;
+        animation: hbFillIn 1.2s var(--ease) forwards, hbProgressGlowSweep 3s linear infinite !important; 
+        background-size: 200% auto !important;
+    }
+    @keyframes hbFillIn { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    @keyframes hbProgressGlowSweep {
+        0% { background-position: 0% center; filter: brightness(1); }
+        50% { filter: brightness(1.35) drop-shadow(0 0 4px rgba(139,124,246,0.6)); }
+        100% { background-position: 200% center; filter: brightness(1); }
+    }
 
-    /* ---------- AURORA BACKGROUND SYSTEMS ---------- */
-    .hb-aurora{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
-    .hb-aurora span{ position:absolute; width:55vw; height:55vw; border-radius:50%; filter:blur(90px); opacity:.30; }
-    .hb-aurora .a1{ background:radial-gradient(circle,var(--violet),transparent 70%); top:-18%; left:-8%; animation:hbDrift1 26s ease-in-out infinite; }
-    .hb-aurora .a2{ background:radial-gradient(circle,var(--hero-green),transparent 70%); top:6%; right:-14%; opacity:.16; animation:hbDrift2 32s ease-in-out infinite; }
-    .hb-aurora .a3{ background:radial-gradient(circle,var(--amber),transparent 70%); bottom:-22%; left:18%; opacity:.14; animation:hbDrift3 38s ease-in-out infinite; }
+    /* ---------- FIX: REFACTORED INDEPENDENT ORB MATRIX PULSING ---------- */
+    .hb-orb-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .hb-orb { 
+        border-radius: 50%; 
+        background: radial-gradient(circle at 35% 30%, var(--oc), transparent 70%), var(--oc);
+        transition: transform 0.4s var(--ease), opacity 0.4s var(--ease), box-shadow 0.4s var(--ease);
+    }
+    
+    /* Sequential rhythmic breathing loop for the home screen system view */
+    .hb-orb-seq-0 { animation: hbOrbPulseLoop 4s ease-in-out infinite; animation-delay: 0.0s; }
+    .hb-orb-seq-1 { animation: hbOrbPulseLoop 4s ease-in-out infinite; animation-delay: 1.0s; }
+    .hb-orb-seq-2 { animation: hbOrbPulseLoop 4s ease-in-out infinite; animation-delay: 2.0s; }
+    .hb-orb-seq-3 { animation: hbOrbPulseLoop 4s ease-in-out infinite; animation-delay: 3.0s; }
+
+    @keyframes hbOrbPulseLoop {
+        0%, 100% { opacity: 0.45; transform: scale(1); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        50% { opacity: 1.0; transform: scale(1.15); box-shadow: 0 0 35px var(--oc), inset 0 0 15px rgba(255,255,255,0.3); }
+    }
+    
+    /* Static active override configuration rule */
+    .hb-orb.active-fixed {
+        opacity: 1 !important;
+        transform: scale(1.12);
+        box-shadow: 0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,0.25);
+        animation: hbOrbPulseLoop 3s ease-in-out infinite alternate !important;
+    }
+    .hb-orb-label { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: center; }
+
+    /* ---------- DECORATIVE MATRIX BACKGROUND LAYER ELEMENTS ---------- */
+    .hb-aurora { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+    .hb-aurora span { position: absolute; width: 55vw; height: 55vw; border-radius: 50%; filter: blur(90px); opacity: .30; }
+    .hb-aurora .a1 { background: radial-gradient(circle,var(--violet),transparent 70%); top: -18%; left: -8%; animation: hbDrift1 26s ease-in-out infinite; }
+    .hb-aurora .a2 { background: radial-gradient(circle,var(--hero-green),transparent 70%); top: 6%; right: -14%; opacity: .16; animation: hbDrift2 32s ease-in-out infinite; }
+    .hb-aurora .a3 { background: radial-gradient(circle,var(--amber),transparent 70%); bottom: -22%; left: 18%; opacity: .14; animation: hbDrift3 38s ease-in-out infinite; }
     @keyframes hbDrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(6%,5%) scale(1.1)}}
     @keyframes hbDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-8%,6%) scale(1.06)}}
     @keyframes hbDrift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(5%,-8%) scale(1.12)}}
 
-    .hb-particles{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
-    .hb-particles i{ position:absolute; width:3px; height:3px; border-radius:50%; background:var(--violet); opacity:.35; animation:hbTwinkle 4s ease-in-out infinite; }
-    .hb-noise{ position:fixed; inset:0; z-index:999; pointer-events:none; opacity:.035; mix-blend-mode:overlay; background-image:radial-gradient(rgba(255,255,255,.6) 1px, transparent 1px); background-size:3px 3px; }
+    .hb-particles { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+    .hb-particles i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: var(--violet); opacity: .35; animation: hbTwinkle 4s ease-in-out infinite; }
+    .hb-noise { position: fixed; inset: 0; z-index: 999; pointer-events: none; opacity: .035; mix-blend-mode: overlay; background-image: radial-gradient(rgba(255,255,255,.6) 1px, transparent 1px); background-size: 3px 3px; }
     @keyframes hbTwinkle{0%,100%{opacity:.1}50%{opacity:.5}}
 
-    .hb-blur{ display:inline-block; filter:blur(8px); opacity:0; transform:translateY(6px); animation:hbBlurIn .7s var(--ease) forwards; }
+    .hb-blur { display: inline-block; filter: blur(8px); opacity: 0; transform: translateY(6px); animation: hbBlurIn .7s var(--ease) forwards; }
     @keyframes hbBlurIn{ to{filter:blur(0); opacity:1; transform:translateY(0);} }
     
-    .hb-gradient-text{ background:linear-gradient(100deg,var(--violet),var(--hero-green) 45%,var(--amber) 85%); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation:hbGradientPan 6s linear infinite; font-weight:700; }
+    .hb-gradient-text { background: linear-gradient(100deg,var(--violet),var(--hero-green) 45%,var(--amber) 85%); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: hbGradientPan 6s linear infinite; font-weight: 700; }
     @keyframes hbGradientPan{ to{ background-position:200% center; } }
-    .hb-shiny{ background:linear-gradient(100deg,var(--text-dim) 35%,var(--text) 50%,var(--text-dim) 65%); background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation:hbShinySweep 3.2s linear infinite; }
+    .hb-shiny { background: linear-gradient(100deg,var(--text-dim) 35%,var(--text) 50%,var(--text-dim) 65%); background-size: 220% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: hbShinySweep 3.2s linear infinite; }
     @keyframes hbShinySweep{ 0%{background-position:120% center;} 100%{background-position:-20% center;} }
 
-    .hb-eyebrow{ font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); }
-    .hb-marquee{ overflow:hidden; -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent); mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent); }
-    .hb-marquee-track{ display:flex; gap:26px; width:max-content; animation:hbMarquee 26s linear infinite; }
-    .hb-marquee-track span{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); white-space:nowrap; }
-    @keyframes hbMarquee{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
-
-    .hb-orb-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
-    .hb-orb{ border-radius:50%; opacity:.45; box-shadow:0 0 20px var(--oc), inset 0 0 12px rgba(255,255,255,.15); background:radial-gradient(circle at 35% 30%, var(--oc), transparent 70%), var(--oc); transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease; }
-    .hb-orb.active{ opacity:1; transform:scale(1.12); box-shadow:0 0 45px var(--oc), inset 0 0 20px rgba(255,255,255,.25); }
-    
-    .hb-status-dot{ width:7px; height:7px; border-radius:50%; background:var(--hero-green); box-shadow:0 0 8px var(--hero-green); display:inline-block; margin-right:6px; animation:hbBlink 2s ease-in-out infinite; }
+    .hb-eyebrow { font-family: 'JetBrains Mono',monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-dim); }
+    .hb-status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--hero-green); box-shadow: 0 0 8px var(--hero-green); display: inline-block; margin-right: 6px; animation: hbBlink 2s ease-in-out infinite; }
     @keyframes hbBlink{ 50%{opacity:.35;} }
 
-    div.stButton > button{ border-radius:10px !important; border:1px solid var(--line) !important; background:var(--bg-elev) !important; color:var(--text) !important; font-family:'Space Grotesk',sans-serif !important; transition:transform .2s var(--ease), border-color .2s var(--ease) !important; }
-    div.stButton > button:hover{ transform:translateY(-2px) scale(1.015); border-color:rgba(139,124,246,.4) !important; }
-    div.stButton > button[kind="primary"]{ background:linear-gradient(120deg,var(--violet),var(--violet-soft)) !important; border:none !important; }
+    div.stButton > button { border-radius: 10px !important; border: 1px solid var(--line) !important; background: var(--bg-elev) !important; color: var(--text) !important; font-family: 'Space Grotesk',sans-serif !important; transition: transform .2s var(--ease), border-color .2s var(--ease) !important; }
+    div.stButton > button:hover { transform: translateY(-2px) scale(1.015); border-color: rgba(139,124,246,.4) !important; }
+    div.stButton > button[kind="primary"] { background: linear-gradient(120deg,var(--violet),var(--violet-soft)) !important; border: none !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -319,7 +341,7 @@ def progress_glow(pct, color_from="var(--violet)", color_to="var(--hero-green)")
     pct = max(0, min(100, pct))
     st.markdown(f"""
     <div class="hb-progress-track">
-        <div class="hb-progress-fill" style="width:{pct}%; background:linear-gradient(90deg,{color_from},{color_to});"></div>
+        <div class="hb-progress-fill" style="width:{pct}%; background:linear-gradient(90deg,{color_from} 0%, {color_to} 100%);"></div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -329,8 +351,11 @@ def marquee(items, speed=26):
     <div class="hb-marquee"><div class="hb-marquee-track" style="animation-duration:{speed}s;">{spans}</div></div>
     """, unsafe_allow_html=True)
 
-def orb(color, label, active=False, size=70):
-    cls = "hb-orb active" if active else "hb-orb"
+def orb(color, label, active=False, size=70, loop_idx=None):
+    if loop_idx is not None:
+        cls = f"hb-orb hb-orb-seq-{loop_idx}"
+    else:
+        cls = "hb-orb active-fixed" if active else "hb-orb"
     style = f"style=\"--oc:{color}; width:{size}px; height:{size}px;\""
     st.markdown(f"""
     <div class="hb-orb-wrap">
@@ -367,7 +392,7 @@ def typewriter_widget(strings, height=46, font_size=20, color="#8b7cf6"):
 def decrypt_text_widget(text, height=46, font_size=22, color="#f3f1ec"):
     html = f"""
     <div id="hb-dx" style="font-family:'JetBrains Mono',monospace; font-size:{font_size}px; color:{color}; background:transparent;"></div>
-    <style>body{{margin:0; background:transparent;}}</script>
+    <style>body{{margin:0; background:transparent;}}</style>
     <script>
       const target = {text!r}; const glyphs = "!<>-_/[]{{}}=+*^?#"; const el = document.getElementById('hb-dx'); let frame = 0;
       const totalFrames = target.length * 3;
@@ -418,7 +443,7 @@ if app_mode == "Home":
     orb_cols = st.columns(4)
     for i, col in enumerate(orb_cols):
         with col:
-            orb(SEGMENT_COLOR_MAP[i], BUSINESS_SEGMENT_MAP[i], size=70)
+            orb(SEGMENT_COLOR_MAP[i], BUSINESS_SEGMENT_MAP[i], size=70, loop_idx=i)
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     eyebrow("CATALOG SAMPLE")
@@ -502,7 +527,6 @@ elif app_mode == "Recommendation":
     if st.session_state.selected_product:
         recommendations = compute_live_recommendation_vector(st.session_state.selected_product, all_unique_products)
         
-        # Recommendations Card updated to match the Predicted Cohort Hover Engine
         interactive_hover_tilt_card(f"""
             <div class="hb-eyebrow">RECOMMENDED CO-PURCHASED PRODUCTS FOR:</div>
             <h2 style="margin:8px 0 14px;">{shiny_text(st.session_state.selected_product)}</h2>
@@ -512,7 +536,7 @@ elif app_mode == "Recommendation":
         for item in recommendations:
             st.markdown(f"✨ **{item}**")
             
-        # Added confidence tracking bar matching the clustering page configuration
+        # Active color-loop tracker bar configured specifically for lookalike vectors
         st.markdown(f'<div class="hb-animated-confidence-text">Relative confidence vs. nearest competing cluster</div>', unsafe_allow_html=True)
         progress_glow(89.4, color_from="var(--violet)", color_to="var(--hero-green)")
         st.markdown(f'<div style="text-align:right; font-family:JetBrains Mono,monospace; font-size:12px; color:var(--text-dim); margin-top:4px;">89.4%</div>', unsafe_allow_html=True)

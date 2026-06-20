@@ -480,6 +480,9 @@ if app_mode == "Home":
         "Segment customers by RFM behavior.",
         "Surface look-alike product recommendations.",
         "All from one console.",
+        "Interactive Dashboard Covering All Products!!",
+        "Machine Learning Model based Customer Segmentation",
+        
     ], height=40, font_size=18)
 
     blur_text(

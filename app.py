@@ -475,7 +475,7 @@ with st.sidebar:
 # 🏠 HOME PAGE MODULE
 # =====================================================================
 if app_mode == "Home":
-    split_text_with_color("SHOPPER'S SPECTRUM", tag="h1")
+    split_text_with_color("SHOPPER SPECTRUM", tag="h1")
     typewriter_widget([
         "Segment customers by RFM behavior.",
         "Surface look-alike product recommendations.",
@@ -483,7 +483,7 @@ if app_mode == "Home":
     ], height=40, font_size=18)
 
     blur_text(
-        "Interactive Dashboard Covering All Products!!\nMachine Learning Model based Customer Segmentation",
+        "Interactive Dashboard Covering All Products!! \nMachine Learning Model based Customer Segmentation",
         tag="p", extra_class=""
     )
 

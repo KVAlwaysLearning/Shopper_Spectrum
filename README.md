@@ -113,6 +113,8 @@ The pre-computed similarity matrix is exposed to a lightweight production wrappe
 
 The interface uses an advanced, highly responsive front-end layer embedded directly into Streamlit components:
 
+**Interactive Live App Link:** https://shopperspectrum-app.streamlit.app/
+
 * **Kinetic Color Headers:** Title segments render through a dynamic multi-color letter reveal, shifting through a smooth pulsing gradient matrix.
 * **Interactive 3D Tilt Panels:** Result cards utilize CSS perspective matrices to execute realistic 3D tilt axes rotations and corner-shape morphing upon hover.
 * **Cipher Decryption Text Widgets:** Selected cluster metrics display via an animated Javascript typography matrix scramble that settles cleanly into the final text result.
